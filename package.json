@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepare": "husky"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.0.4",
