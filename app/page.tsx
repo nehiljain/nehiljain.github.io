@@ -1,16 +1,17 @@
 import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn, sortPosts } from '@/lib/utils';
 import Link from 'next/link';
 import BlurFade from '@/components/magicui/blur-fade';
 import BlurFadeText from '@/components/magicui/blur-fade-text';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DATA } from '@/data/resume';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { posts } from '#site/content';
+import { PostItem } from '@/components/post-item';
 
 const BLUR_FADE_DELAY = 0.04;
 
 export default function Home() {
+  const latestPosts = sortPosts(posts).slice(0, 5);
   return (
     <main className="container max-w-4xl mx-auto flex flex-col min-h-[100dvh] space-y-10 py-8">
       {/* Hero Section */}
@@ -20,7 +21,7 @@ export default function Home() {
             <div className="flex-col flex flex-1 space-y-1.5">
               <BlurFadeText
                 delay={BLUR_FADE_DELAY}
-                className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none"
+                className="text-2xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none"
                 yOffset={8}
                 text={`Hello, I'm ${DATA.name} 👋`}
               />
@@ -29,23 +30,6 @@ export default function Home() {
                 delay={BLUR_FADE_DELAY}
                 text={DATA.description}
               />
-              <BlurFade delay={BLUR_FADE_DELAY * 2}>
-                <div className="flex gap-2 mt-4">
-                  {Object.entries(DATA.contact.social).map(([name, social]) => (
-                    <Link
-                      key={name}
-                      href={social.url}
-                      className={buttonVariants({
-                        variant: 'ghost',
-                        size: 'icon'
-                      })}
-                      target="_blank"
-                    >
-                      <social.icon className="size-5" />
-                    </Link>
-                  ))}
-                </div>
-              </BlurFade>
             </div>
             <BlurFade delay={BLUR_FADE_DELAY}>
               <Avatar className="size-28 border">
@@ -60,29 +44,43 @@ export default function Home() {
       {/* About Section */}
       <section id="about" className="flex min-h-0 flex-col gap-y-3">
         <BlurFade delay={BLUR_FADE_DELAY * 3}>
-          <h2 className="text-xl font-bold">About</h2>
+          <h2 className="text-2xl font-bold">About</h2>
         </BlurFade>
         <BlurFade delay={BLUR_FADE_DELAY * 4}>
           <p className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert">
             {DATA.description}
           </p>
         </BlurFade>
-        <Link
-          href="/about"
-          className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
-        >
-          Learn More About Me →
-        </Link>
       </section>
 
       {/* Latest Projects Section */}
       <section id="projects" className="flex min-h-0 flex-col gap-y-3">
         <BlurFade delay={BLUR_FADE_DELAY * 7}>
-          <h2 className="text-xl font-bold">Latest Projects</h2>
+          <h2 className="text-2xl font-bold">Latest Posts</h2>
         </BlurFade>
-        <div className="space-y-4">
-          {DATA.projects.slice(0, 3).map((project, idx) => (
-            <BlurFade key={project.title} delay={BLUR_FADE_DELAY * (8 + idx)}>
+        <ul className="flex flex-col">
+          {latestPosts.map(
+            (post, idx) =>
+              post.published && (
+                <BlurFade key={post.title} delay={BLUR_FADE_DELAY * (8 + idx)}>
+                  <li
+                    key={post.slug}
+                    className="first:border-t first:border-border"
+                  >
+                    <PostItem
+                      slug={post.slug}
+                      title={post.title}
+                      description={post.description}
+                      date={post.date}
+                      tags={post.tags}
+                    />
+                  </li>
+                </BlurFade>
+              )
+          )}
+        </ul>
+        {/* {latestPosts.map((post) => (
+            <BlurFade key={post.title} delay={BLUR_FADE_DELAY * (8 + idx)}>
               <Card>
                 <CardContent className="pt-6">
                   <div className="space-y-4">
@@ -115,13 +113,13 @@ export default function Home() {
                 </CardContent>
               </Card>
             </BlurFade>
-          ))}
-        </div>
+          ))} */}
+
         <Link
           href="/about#projects"
           className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
         >
-          View All Projects →
+          View All Posts →
         </Link>
       </section>
 

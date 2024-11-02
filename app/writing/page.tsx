@@ -5,10 +5,12 @@ import { Tag } from '@/components/tag';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAllTags, sortPosts, sortTagsByCount } from '@/lib/utils';
 import { Metadata } from 'next';
+import { NotebookPen } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'My blog',
-  description: 'This is a description'
+  title: 'My writing',
+  description:
+    'Experiments, TILs, Notes about AI, Data Infrastructure, Startups ...'
 };
 
 const POSTS_PER_PAGE = 5;
@@ -36,9 +38,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     <div className="container max-w-4xl py-6 lg:py-10">
       <div className="flex flex-col items-start gap-4 md:flex-row md:justify-between md:gap-8">
         <div className="flex-1 space-y-4">
-          <h1 className="inline-block font-black text-4xl lg:text-5xl">Blog</h1>
+          <h2 className="inline-block font-black text-3xl lg:text-4xl">
+            <NotebookPen className="inline-block size-6 lg:size-10 mr-2" />
+            Writing
+          </h2>
           <p className="text-xl text-muted-foreground">
-            My ramblings on all things web dev.
+            Experiments, TILs, Notes about AI, Data Infrastructure, Startups ...
           </p>
         </div>
       </div>
