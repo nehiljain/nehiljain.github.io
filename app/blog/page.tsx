@@ -1,14 +1,14 @@
-import { posts } from "#site/content";
-import { PostItem } from "@/components/post-item";
-import { QueryPagination } from "@/components/query-pagination";
-import { Tag } from "@/components/tag";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAllTags, sortPosts, sortTagsByCount } from "@/lib/utils";
-import { Metadata } from "next";
+import { posts } from '#site/content';
+import { PostItem } from '@/components/post-item';
+import { QueryPagination } from '@/components/query-pagination';
+import { Tag } from '@/components/tag';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getAllTags, sortPosts, sortTagsByCount } from '@/lib/utils';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "My blog",
-  description: "This is a description",
+  title: 'My blog',
+  description: 'This is a description'
 };
 
 const POSTS_PER_PAGE = 5;

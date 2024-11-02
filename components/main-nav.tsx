@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { siteConfig } from "@/config/site";
-import { Icons } from "./icons";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { DATA } from '@/data/resume';
+import { Icons } from './icons';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export function MainNav() {
   const pathname = usePathname();
@@ -12,26 +12,22 @@ export function MainNav() {
     <nav className="flex items-center space-x-4 lg:space-x-6">
       <Link href="/" className="mr-6 flex items-center space-x-2">
         <Icons.logo className="h-6 w-6" />
-        <span className="font-bold">{siteConfig.name}</span>
+        <span className="font-bold">{DATA.name}</span>
       </Link>
-      <Link
-        href="/blog"
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
-          pathname === "/blog" ? "text-foreground" : "text-foreground/60"
-        )}
-      >
-        Blog
-      </Link>
-      <Link
-        href="/about"
-        className={cn(
-          "text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block",
-          pathname === "/about" ? "text-foreground" : "text-foreground/60"
-        )}
-      >
-        About
-      </Link>
+      {DATA.navbar
+        .filter((item) => item.href !== '/') // Exclude home since it's already shown with logo
+        .map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'text-sm font-medium transition-colors hover:text-primary hidden sm:inline-block',
+              pathname === item.href ? 'text-foreground' : 'text-foreground/60'
+            )}
+          >
+            {item.label}
+          </Link>
+        ))}
     </nav>
   );
 }

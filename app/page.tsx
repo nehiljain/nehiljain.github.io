@@ -1,64 +1,147 @@
-import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/config/site";
-import { cn, sortPosts } from "@/lib/utils";
-import { posts } from "#site/content";
-import Link from "next/link";
-import { PostItem } from "@/components/post-item";
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import BlurFade from '@/components/magicui/blur-fade';
+import BlurFadeText from '@/components/magicui/blur-fade-text';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { DATA } from '@/data/resume';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+
+const BLUR_FADE_DELAY = 0.04;
 
 export default function Home() {
-  const latestPosts = sortPosts(posts).slice(0, 5);
   return (
-    <>
-      <section className="space-y-6 pb-8 pt-6 md:pb-12 md:mt-10 lg:py-32">
-        <div className="container flex flex-col gap-4 text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-balance">
-            Hello, I&apos;m James
-          </h1>
-          <p className="max-w-[42rem] mx-auto text-muted-foreground sm:text-xl text-balance">
-            Welcome to my blog template. Built using tailwind, shadcn, velite
-            and Nextjs 14.
-          </p>
-          <div className="flex flex-col gap-4 justify-center sm:flex-row">
-            <Link
-              href="/blog"
-              className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-fit")}
-            >
-              View my blog
-            </Link>
-            <Link
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "w-full sm:w-fit"
-              )}
-            >
-              GitHub
-            </Link>
+    <main className="container max-w-4xl mx-auto flex flex-col min-h-[100dvh] space-y-10 py-8">
+      {/* Hero Section */}
+      <section id="hero">
+        <div className="mx-auto w-full space-y-8">
+          <div className="gap-2 flex justify-between">
+            <div className="flex-col flex flex-1 space-y-1.5">
+              <BlurFadeText
+                delay={BLUR_FADE_DELAY}
+                className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none"
+                yOffset={8}
+                text={`Hello, I'm ${DATA.name} 👋`}
+              />
+              <BlurFadeText
+                className="max-w-[600px] md:text-xl text-muted-foreground"
+                delay={BLUR_FADE_DELAY}
+                text={DATA.description}
+              />
+              <BlurFade delay={BLUR_FADE_DELAY * 2}>
+                <div className="flex gap-2 mt-4">
+                  {Object.entries(DATA.contact.social).map(([name, social]) => (
+                    <Link
+                      key={name}
+                      href={social.url}
+                      className={buttonVariants({
+                        variant: 'ghost',
+                        size: 'icon'
+                      })}
+                      target="_blank"
+                    >
+                      <social.icon className="size-5" />
+                    </Link>
+                  ))}
+                </div>
+              </BlurFade>
+            </div>
+            <BlurFade delay={BLUR_FADE_DELAY}>
+              <Avatar className="size-28 border">
+                <AvatarImage alt={DATA.name} src={DATA.avatarUrl} />
+                <AvatarFallback>{DATA.initials}</AvatarFallback>
+              </Avatar>
+            </BlurFade>
           </div>
         </div>
       </section>
-      <section className="container max-w-4xl py-6 lg:py-10 flex flex-col space-y-6 mt-60">
-        <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-center">
-          Latest Posts
-        </h2>
-        <ul className="flex flex-col">
-          {latestPosts.map((post) => (
-            post.published && (
-              <li key={post.slug} className="first:border-t first:border-border">
-                <PostItem
-                  slug={post.slug}
-                  title={post.title}
-                  description={post.description}
-                  date={post.date}
-                  tags={post.tags}
-                />
-              </li>
-            )
-          ))}
-        </ul>
+
+      {/* About Section */}
+      <section id="about" className="flex min-h-0 flex-col gap-y-3">
+        <BlurFade delay={BLUR_FADE_DELAY * 3}>
+          <h2 className="text-xl font-bold">About</h2>
+        </BlurFade>
+        <BlurFade delay={BLUR_FADE_DELAY * 4}>
+          <p className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert">
+            {DATA.description}
+          </p>
+        </BlurFade>
+        <Link
+          href="/about"
+          className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
+        >
+          Learn More About Me →
+        </Link>
       </section>
-    </>
+
+      {/* Latest Projects Section */}
+      <section id="projects" className="flex min-h-0 flex-col gap-y-3">
+        <BlurFade delay={BLUR_FADE_DELAY * 7}>
+          <h2 className="text-xl font-bold">Latest Projects</h2>
+        </BlurFade>
+        <div className="space-y-4">
+          {DATA.projects.slice(0, 3).map((project, idx) => (
+            <BlurFade key={project.title} delay={BLUR_FADE_DELAY * (8 + idx)}>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{project.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {project.industry} • {project.role}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          project.status === 'current' ? 'default' : 'secondary'
+                        }
+                      >
+                        {project.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.technologies.slice(0, 4).map((tech) => (
+                        <Badge key={tech} variant="outline">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </BlurFade>
+          ))}
+        </div>
+        <Link
+          href="/about#projects"
+          className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
+        >
+          View All Projects →
+        </Link>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="flex min-h-0 flex-col gap-y-3">
+        <BlurFade delay={BLUR_FADE_DELAY * 11}>
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold">Get in Touch</h2>
+            <p className="prose max-w-[600px] text-pretty font-sans text-sm text-muted-foreground dark:prose-invert">
+              Feel free to reach out for collaborations or just a friendly hello
+            </p>
+            <Link
+              href={`mailto:${DATA.email}`}
+              className={buttonVariants({ size: 'lg' })}
+            >
+              Say Hello
+            </Link>
+          </div>
+        </BlurFade>
+      </section>
+    </main>
   );
 }
