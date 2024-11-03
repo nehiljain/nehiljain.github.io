@@ -19,16 +19,15 @@ export function PostItem({
   tags
 }: PostItemProps) {
   return (
-    <Link href={'/' + slug}>
-      <article
-        className="group relative rounded-lg border p-6 shadow-md 
-        hover:shadow-lg transition-all duration-200 
-        hover:bg-accent hover:border-accent-foreground cursor-pointer"
+    <div className="relative">
+      <Link
+        href={'/' + slug}
+        className="block group rounded-lg border p-6 shadow-md 
+          hover:shadow-lg transition-all duration-200 
+          hover:bg-accent hover:border-accent-foreground cursor-pointer"
       >
-        <div className="flex flex-col gap-4">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-          </div>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
 
           {tags && tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -44,7 +43,7 @@ export function PostItem({
             </div>
           )}
 
-          <div className="flex justify-between items-center pt-0">
+          <div className="flex justify-between items-center">
             <dl>
               <dt className="sr-only">Published On</dt>
               <dd className="text-sm font-medium flex items-center gap-1.5 text-muted-foreground">
@@ -55,7 +54,7 @@ export function PostItem({
             <span className="text-sm font-medium">Read more →</span>
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+    </div>
   );
 }
