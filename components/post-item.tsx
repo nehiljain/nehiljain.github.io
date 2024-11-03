@@ -9,7 +9,7 @@ interface PostItemProps {
   description?: string;
   date: string;
   tags?: Array<string>;
-  content: string;
+  content?: string;
 }
 
 export function PostItem({
@@ -43,8 +43,12 @@ export function PostItem({
               <time dateTime={date}>{formatDate(date)}</time>
             </span>
 
-            <Circle className="h-1.5 w-1.5 fill-current" />
-            <span className="text-sm">{getReadingTime(content)}</span>
+            {content && (
+              <>
+                <Circle className="h-1.5 w-1.5 fill-current" />
+                <span className="text-sm">{getReadingTime(content)}</span>
+              </>
+            )}
 
             {tags && tags.length > 0 && (
               <>
