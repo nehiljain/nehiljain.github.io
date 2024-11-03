@@ -1,0 +1,47 @@
+---
+title: '9 Out Of Every 10 Beginner Data Scientists Are Afraid Of Refactoring Their Code. Are You One Of Them?'
+description: "Before you're left behind, discover how mastering code refactoring can elevate your career."
+date: 2024-02-08
+tags: ['mlops']
+published: true
+---
+
+> "I was happy until it was time for deploying our models to production."
+>
+> - Typical Data Scientist
+
+If this resonates with you, let us make it a cakewalk with some tools.
+
+I have pushed through many cycles of Proof Of Concept to Production and it is hard to do all the things right in the first attempt of solving a problem. Iteratively improving the code, performance and accuracy of your output is all the matters.
+
+These tools will equip you rewrite your code and improve it by 10x.
+
+## Refactoring is very similar to getting an accurate model; Establish your baseline of the evaluation metric.
+
+First, Identify the set of metrics and measure them.
+
+There are various aspects you may want to improve on. My favourite metrics to chose from are: maintainability index, code complexity, testing code coverage, run times of mission critical pieces, and number of linting errors. There are packages like wily, PyTest, cProfile and PyLint which can do this without writing any code.
+
+## Automated Testing in similar to model training; Prevent garbage in garbage out.
+
+Second, let the tools protect you from unexpected or bad quality input.
+
+Start by writing a test for your primary pipeline. Let your gut guide you here. Use PyTest or native unittest library to get started. If data is crucial for your test, design a sample dataset that can be used as input for your testing. Once you have this testing, add it to CI/CD and then you can confidently start refactoring or modifying your code.
+
+Another high leverage activity is adding data validations to I/O dataframes. Use Great Expectations or Pandera for this and add it to all the functions that perform a transformation.
+
+## Be kind to your future self; Setup alerting and logging to help yourself in a state of crisis.
+
+You (the developer) should know if your code breaks before your users.
+
+If you are using workflow engines like Airflow, Prefect, or Dagster, all you need to do is raise an exception with a sensible method. If not, then integrate an email/text notification service to send out alert notifications to the team. Add enough logging to help you isolate and debug the issue quickly.
+
+## Be kind to others you work with; Make your code re-useable and readable
+
+> “Whenever I have to think to understand what the code is doing, I ask myself if I can refactor the code to make that understanding more immediately apparent.” - Martin Fowler
+
+This one is long but a fun one to work on. Look for duplicated code, functions longer than 300 lines, long parameter lists, repeated if-else statements; these are your perfect signals to make the code better. If you find it hard to make classes or apply design patterns, it is a signal to talk to a senior engineer on the team to review that code and help you.
+
+Finally, I want to let you know that, the more you do the above, the faster and more efficient you get in doing it.
+
+Ultimately, you spend less time and make more money and impact.
