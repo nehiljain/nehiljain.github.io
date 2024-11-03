@@ -2,16 +2,16 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { slug } from 'github-slugger';
 import { type Post } from '#site/content';
+import readingTime from 'reading-time';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(input: string | number): string {
-  const date = new Date(input);
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
+export function formatDate(date: string) {
+  return new Date(date).toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
     year: 'numeric'
   });
 }
@@ -75,4 +75,10 @@ export function generateActivityData(posts: Array<Post>) {
   }));
 
   return activityData;
+}
+
+export function getReadingTime(text: string | undefined) {
+  if (!text) return '1 min read'; // Default fallback
+  const stats = readingTime(text);
+  return `${Math.ceil(stats.minutes)} min read`;
 }

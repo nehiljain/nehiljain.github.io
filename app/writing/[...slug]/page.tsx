@@ -6,6 +6,9 @@ import '@/styles/mdx.css';
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
 import { Tag } from '@/components/tag';
+import { Calendar, Circle } from 'lucide-react';
+import { formatDate, getReadingTime } from '@/lib/utils';
+
 interface PostPageProps {
   params: {
     slug: string[];
@@ -74,12 +77,30 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <article className="container py-6 prose dark:prose-invert max-w-3xl mx-auto">
       <h1 className="mb-2">{post.title}</h1>
-      <div className="flex gap-2 mb-2">
-        {post.tags?.map((tag) => <Tag tag={tag} key={tag} />)}
-      </div>
       {post.description ? (
         <p className="text-xl mt-0 text-muted-foreground">{post.description}</p>
       ) : null}
+      <div className="flex items-center gap-2 text-muted-foreground mb-4 !mt-0">
+        <span className="flex items-center gap-1 text-sm">
+          <Calendar className="h-4 w-4" />
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
+        </span>
+
+        <Circle className="h-1.5 w-1.5 fill-current" />
+        <span className="text-sm">{getReadingTime(post.body)}</span>
+
+        {post.tags && post.tags.length > 0 && (
+          <>
+            <Circle className="h-1.5 w-1.5 fill-current" />
+            <div className="flex flex-wrap gap-1">
+              {post.tags.map((tag) => (
+                <Tag tag={tag} key={tag} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
       <hr className="my-4" />
       <MDXContent code={post.body} />
     </article>

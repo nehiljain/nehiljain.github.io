@@ -1,6 +1,6 @@
-import { Calendar } from 'lucide-react';
+import { Calendar, Circle } from 'lucide-react';
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getReadingTime } from '@/lib/utils';
 import { Tag } from './tag';
 
 interface PostItemProps {
@@ -9,6 +9,7 @@ interface PostItemProps {
   description?: string;
   date: string;
   tags?: Array<string>;
+  content?: string;
 }
 
 export function PostItem({
@@ -16,26 +17,19 @@ export function PostItem({
   title,
   description,
   date,
-  tags
+  tags,
+  content
 }: PostItemProps) {
   return (
     <div className="relative">
       <Link
         href={'/' + slug}
-        className="block group rounded-lg border p-6 shadow-md 
+        className="block group rounded-lg border p-4 shadow-md 
           hover:shadow-lg transition-all duration-200 
           hover:bg-accent hover:border-accent-foreground cursor-pointer"
       >
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-
-          {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Tag tag={tag} key={tag} />
-              ))}
-            </div>
-          )}
+        <div className="space-y-2">
+          <h2 className="text-xl font-bold tracking-tight">{title}</h2>
 
           {description && (
             <div className="text-muted-foreground line-clamp-2">
@@ -43,15 +37,29 @@ export function PostItem({
             </div>
           )}
 
-          <div className="flex justify-between items-center">
-            <dl>
-              <dt className="sr-only">Published On</dt>
-              <dd className="text-sm font-medium flex items-center gap-1.5 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <time dateTime={date}>{formatDate(date)}</time>
-              </dd>
-            </dl>
-            <span className="text-sm font-medium">Read more →</span>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="flex items-center gap-1 text-sm">
+              <Calendar className="h-4 w-4" />
+              <time dateTime={date}>{formatDate(date)}</time>
+            </span>
+
+            {content && (
+              <>
+                <Circle className="h-1.5 w-1.5 fill-current" />
+                <span className="text-sm">{getReadingTime(content)}</span>
+              </>
+            )}
+
+            {tags && tags.length > 0 && (
+              <>
+                <Circle className="h-1.5 w-1.5 fill-current" />
+                <div className="flex flex-wrap gap-1">
+                  {tags.map((tag) => (
+                    <Tag tag={tag} key={tag} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Link>
