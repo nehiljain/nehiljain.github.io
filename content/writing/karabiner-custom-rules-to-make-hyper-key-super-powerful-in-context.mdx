@@ -1,0 +1,56 @@
+---
+title: "Unlocking the Power of Your Keyboard: Custom Rules for Making the Hyper Key Super Effective"
+description: "Imagine effortlessly executing 40 shortcuts per app with just a simple key combination!"
+date: 2024-02-06
+tags: ['cli']
+published: true
+---
+
+I can create custom rules for keyboard shortcuts and reduce overhead on my memory to remember all the various combinations.
+
+Using `caps_lock + {single letter}` gives me ability to do ~40 shortcuts per app. That is plenty :)
+
+Example config:
+```json
+{
+    "description": "Caps Lock + A to Command+Shift+Option+Control+A in Spark",
+    "manipulators": [
+        {
+            "conditions": [
+                {
+                    "bundle_identifiers": [
+                        "^com.readdle.smartemail-Mac"
+                    ],
+                    "type": "frontmost_application_if"
+                }
+            ],
+            "from": {
+                "key_code": "a",
+                "modifiers": {
+                    "mandatory": ["caps_lock"], 
+                    "optional": ["any"]
+                }
+            },
+            "to": [
+                {
+                    "key_code": "a",
+                    "modifiers": [
+	                    "left_command", 
+	                    "left_shift", 
+	                    "left_option", 
+	                    "left_control"
+	                ]
+                }
+            ],
+            "type": "basic"
+        }
+    ]
+}
+```
+
+Chatgpt produces perfect json configs for karabiner.
+I wonder if I can create a small utility to give english description and generate this config using AI. It took 
+1. Connecting logs from karabiner-eventviewer 
+2. Finding example karabiner json to validate output  
+3. Adding my custom in the right place
+Reduce 3 steps to 1.

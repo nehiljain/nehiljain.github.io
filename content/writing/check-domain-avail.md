@@ -1,0 +1,38 @@
+---
+title: How to check domain availability in python
+description: A simple way to check domain availability in python
+date: 2024-02-06
+tags: ['python']
+published: true
+---
+
+The right way:
+
+```python
+import whoisdomain as whois
+def check_domain_availability(domain):
+	try:
+		d = whois.query(domain)
+		return (domain, d is None) # Return tuple with domain and availability
+	except Exception:
+		print(f"{domain} ❌ available")
+		return (domain, False) # Assume taken if there's an error
+```
+
+## Learning:
+
+DNS lookup to check domain availability, may not always be accurate. This method can't detect domains that are registered but not assigned to a DNS server.
+
+Wrong way:
+
+```python
+import socket
+def check_domain(domain):
+	try:
+		socket.gethostbyname(domain)
+		return False # Domain resolves, so it is taken
+	except socket.gaierror:
+		return True # Domain does not resolve, so it might be available
+```
+
+#python

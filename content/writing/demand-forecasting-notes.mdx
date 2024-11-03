@@ -1,0 +1,125 @@
+---
+title: Demand Forecasting Best Practices
+description: Notes from the book - Demand Forecasting Best Practices
+date: 2024-02-12
+tags: ['forecasting']
+published: true
+---
+
+These are my notes for the book - [Demand Forecasting Best Practices](https://www.amazon.com/Demand-Forecasting-Practices-Nicolas-Vandeput/dp/1633438090)
+
+Better forecasting allows supply team to
+
+- streamline operations because of north star being clear to everyone
+- fewer shortages because you know where the demand is going to be
+- less useless supply because same as above
+- more sales because you are matching better supply to the forecasted demand
+
+Demand forecasts will help support the sourcing team in travel companies with:
+
+1. How much to product to buy?
+2. Where to spend time integrating for distribution?
+3. Help suppliers/hotels provide a long term view of demand from you. This will give them confidence in costs, required service level etc.
+4.
+
+Companies and tools doing Inventory Management and Demand forecasting in Travel are: 1. https://hoteltechreport.com/news/hotel-investment 2. https://hoteltechreport.com/news/hotel-loans 3. https://hoteltechreport.com/news/duetto-hotel-forecasting-budgeting-innovations 4. https://hoteltechreport.com/news/hotel-forecasting 5. https://hoteltechreport.com/news/hotel-nikko-san-francisco 6. Oracle Hospitality Revenue Management 7. Amadeus Demand360 8. OTA Insight 9. Infor Hospitality 10. RateGain 11. Duetto 12. Rainmaker (a Cendyn company) 13. IDeaS Revenue Solutions 14. STR (Smith Travel Research)
+
+## 5 step framework for demand planning process:
+
+![CleanShot 2024-02-12 at 21.02.22.png](/blog_images/CleanShot%202024-02-12%20at%2021.02.22.png)
+
+Objective: Know the types of decisions your supply chain needs to make helps you define the objective
+
+> [!NOTE] Quote
+> Forecasting demand is always a means to an end, not the end itself
+
+Demand: What you consumers want, when they want it and how much they want.
+
+> [!NOTE] Note
+> Do NOT forecast sales. Sales are constrained by supply which is not the same as real (unconstrained) demand. There is a negative feedback look if you rely on sales forecasts.
+
+Steps to make useful forecasts:
+
+1. Track demand rather than sales. Capturing unconstrained demand can be hard.
+2. In case of shortages, be cautious in how to capture demand
+3. Identify and track demand drivers for your business
+   1. For travel, events and weather are two big ones
+4. You forecast unconstrained demand
+5. Transform forecast into Sales or Revenue forecast based on expected shortages and prices
+
+> [!NOTE] Separate Demand Forecast and Supply plan
+> You can choose to supply 10 rooms even though forecast shows a demand for 20 rooms. Forecast should be used to make the best decision about supply plan and not be the same as the supply plan itself.
+
+You can use demand forecast as a baseline for financial budget but make sure to constrain it based on expected shortages and weight it based on expected prices.
+Sales targets often result in political conflicts over demand forecasts as salespeople will want forecasts to be as low as possible to make sales target easier to beat.
+
+> [!NOTE] Most companies do not record demand but sales
+
+> [!Alarm] Make sure service teams do not change the data manually to show artificially high KPIs
+
+Different types of orders in Hotel Supply Chain:
+
+1. Open order: Room that are booked, not cancelled and DTA is > 1
+2. Duplicated order: Unlikely in travel world
+3. Canceled order: Rooms that were once booked and later canceled
+4. Substitution order: Rooms that were bought instead of another room because of better price or availability
+
+When there is no shortage, sales and demand are the same. Tracking when you are out of stock will allow you to know when demand and sales are not aligned.
+Track inventory over time on top of sales.
+
+### Demand drivers for Hotel Bookings
+
+1. **Seasonality**: Demand for hotel rooms fluctuates with seasons, holidays, and school vacation periods. Summer months, major holidays, and local event periods often see higher demand.
+2. **Economic Conditions**: The broader economic environment impacts travel spending. In a strong economy, both leisure and business travel tend to increase.
+3. **Events and Conferences**: Large events, conferences, and conventions can drive significant demand for hotel rooms in a city or region.
+4. **Tourist Attractions**: Proximity to major tourist attractions or destinations can drive demand, especially during peak tourist seasons.
+5. **Business and Industry Activity**: Locations with a high concentration of businesses, corporate headquarters, or industrial parks see regular demand from business travelers.
+6. **Transportation Hubs**: Hotels near major airports, train stations, or along highway routes often have steady demand from travelers in transit.
+7. **Cultural and Sporting Events**: Concerts, sports events, festivals, and cultural celebrations can create spikes in demand.
+8. **Marketing and Promotions**: Effective marketing strategies and promotional offers can drive bookings, especially during off-peak times.
+9. **Price and Value Proposition**: Competitive pricing and perceived value (including quality of service and amenities) can attract more guests.
+10. Forex by currency/country:
+
+### Substitution and Cannibalization of products
+
+Substitution: One product being out of stock can drive sales for another product
+Cannibalization :Promotion on one product or launch of new products can result in lower sales for a product.
+
+If we forecast sales in both cases, we will over forecast the wrong product. These two factors are complicated to get right during ML.
+
+Potential solution: Demand forecast at the family/group level.
+
+### Two echelons supply chain
+
+![CleanShot 2024-02-12 at 21.04.39.png](/images/CleanShot%202024-02-12%20at%2021.04.39.png)
+
+- [ ] Identify what is the source of unconstrained demand
+- [ ] What are the steps of planning and constraints on the system
+- [ ] Track points of information loss to get more accuracy in forecasts
+
+**BULLWHIP Effect**:
+
+1. The more upstream an echelon is in the supply chain, the more demand variation it faces.
+2. Small deviations of the final customer demand will produce large variability as you go upstream in the supply chain. This gets worse proportional to the number of middle men in the supply chain
+3. Main causes for this effect:
+   1. Order forecasting: If you dont tie forecast to end customer demand but the direct client then at every step of the supply chain, noise/error is introduced. This noise, multiplies as you get further away from end customers.
+   2. Order batching: The more upstream the node in the supply chain, the bigger the batch size of order. Eg. End customer gets 1 hotel room, Bed bank gets 80% of the room nights for the whole season.
+   3. Price fluctuation and promotions: Different nodes apply margins and promotions which are not shared throughout the supply chain, this adds noise to the forecast.
+   4. Shortage gaming: In case of shortage, the nodes behave differently based on their strategies and risk aversion. This creates a cycle of speculative orders and shortages.
+   5. Lead time variation: Doesnt seem to apply to Travel.
+
+### Internal Collaboration
+
+1. Drive end to end visibility of demand. Connect and leverage all internal data to improve quality of your forecasts
+2. Centralized inventory planning: Set centralized inventory policies. Ensure these are followed locally.
+
+### External Collaboration
+
+Collab with all nodes of the supply chain to have a leaner logistics chain and reduce bullwhip.
+Why:
+
+1. Better forecasts
+2. Lower costs
+3. Higher service levels
+
+> [!NOTE] Promote frequent small orders and reduce batch size

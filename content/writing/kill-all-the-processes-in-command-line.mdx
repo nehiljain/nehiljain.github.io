@@ -1,0 +1,29 @@
+---
+title: "How To Kill Processes In Command Line Like A Pro"
+description: "See why thousands are abandoning tedious process management for efficient command line techniques."
+date: 2024-02-05
+tags: ['productivity', '#cli']
+published: true
+---
+
+I love working in #cli a lot. There is a common task of running daemon processes and then killing them at later stage.
+
+Nowadays, I am building a project with dagster. I have been running Dagster locally, as documented at [docs.dagster.io/deployment/guides/servi…](https://docs.dagster.io/deployment/guides/service).
+
+Let’s say I want to kill the running dagster webserver:
+
+### Old Tedious Process:
+
+1. `ps -ef | grep dagster-webserver`
+    
+2. `kill -9 PID`
+    
+
+### New Process:
+
+1. `pkill -SIGTERM -f dagster-webserver`
+
+### Reference Items:
+
+1. [youtube.com/watch?v=KdSKTEUPPEk](https://www.youtube.com/watch?v=KdSKTEUPPEk&amp;ab_channel=anthonywritescode)
+2. [youtube.com/watch?v=KdSKTEUPPEk](https://www.youtube.com/watch?v=KdSKTEUPPEk&amp;ab_channel=anthonywritescode)

@@ -1,0 +1,48 @@
+---
+{
+  'created': '2024-02-20T07:51',
+  'updated': '2024-04-12T21:50',
+  'dg-publish': true,
+  'tags': ['genai', 'data-engineering'],
+  'permalink': '/ti-ls/text-2-sql-research/',
+  'dgPassFrontmatter': true,
+  'noteIcon': ''
+}
+---
+
+https://haystack.deepset.ai/blog/business-intelligence-sql-queries-llm
+![CleanShot 2024-02-20 at 07.52.05.png](/images/CleanShot%202024-02-20%20at%2007.52.05.png)
+
+Schema aware context:
+
+1. Results in very long prompt
+2. Costly to run without caching or LLM memory
+3. Gives much better accuracy
+4. Needle in a haystack problem
+
+Agent:
+
+1. Can discover schema and sample rows without explicitly brute forced into the prompt. Solves above problem
+2. Will guarantee valid sql because agent can run it before giving it to user
+3. After bunch of discovery, agent may end up in super long prompts with data, schemas etc.
+4. Agents are more black-box to users and so harder to debug and explain
+5.
+
+For the data teams to extract more value out of AI, they should be focusing on:
+
+1. HQ Data Model: Model data properly to remove ambiguity and redundancy in the way the data is structured
+2. Detailed schema: Create detailed schema for the data model with table and column level description
+3. Sample traits of the data: Create distinct 20 values of each column for the context of what are the values of a col.
+4. Generate some example: LLMs will perform better with few shots. This implies data team should look back and create pairs of objective in natural language and resulting accurate SQL.
+5. Fewer Tables: Because table retrieval is not accurate it makes your tweak your data model. The better data model for AI would have fewer wider tables so it can easily match the query to the right subset of tables.
+
+I don't think its possible for individuals to hand curate all this information when querying LLMs. So the existing (or new) tools will have to assist them.
+
+Some tools that come to mind:
+
+1. Data Quality and Catalog Tools
+2. Semantic Layer
+3. Data Lineage Tools
+4. Headless browsers or analysis queries
+
+A New startup should not be building all these things from ground up. A lot of these already exist and have been innovated on in the past couple of years.

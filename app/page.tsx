@@ -116,7 +116,7 @@ export default function Home() {
           ))} */}
 
         <Link
-          href="/about#projects"
+          href="/writing"
           className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
         >
           View All Posts →

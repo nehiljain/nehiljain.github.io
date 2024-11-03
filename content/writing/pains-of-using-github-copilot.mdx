@@ -1,0 +1,22 @@
+---
+title: "9 Out Of Every 10 Data Engineers Make This Mistake When Using GitHub Copilot. Are You One Of Them?"
+description: "Here's why so many data engineers are struggling with GitHub Copilot—and how to avoid common pitfalls."
+date: 2024-02-28
+tags: ['genai', 'productivity']
+published: true
+---
+
+
+Today I was writing a data pipeline to much some timeseries data.
+Usual stuff, clean the columns, join some data together. Check the counts etc.
+I was using pandas for most of it because Copilot is faster and more convenient for it.
+
+It felt like a 10x engineer moment where the amount of good code i was able to write was super fast. After 2 hours I was done. When I ran everything and started QAing my work deeper, I found a problem. 
+
+It took a bloody 5 hours to debug the problem and it was a missing col name in a list of cols which was created by copilot tab completion. Downstream of it, all the operations missed that col and it was no obvious so I didnt look for it there. I kept sussing that the whole col is null because biz logic of a join is incorrect somewhere. The usual DE assumption. That was wrong!
+
+Here are something I will improve in my day to day because of this:
+
+1. Validate early and often: Add data validation throughout the pipeline
+2. Focus on clear variable names: Not having ambiguous or non-descriptive variable/column names help the copilot make less mistakes
+3. TDD: Where possible think about what I would test before writing the code itself.

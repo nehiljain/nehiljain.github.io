@@ -1,0 +1,15 @@
+---
+title: Duckdb + DBT doing python models 💪
+description: Duckdb + DBT doing python models
+date: 2024-02-05
+tags: ['data-engineering']
+published: true
+---
+
+My transformation logic in a data pipeline in dbt required, dynamically generating regex based on another column. My intuition was, its a simple pandas apply with lambda function to get the value out of the other col; but in SQL damn hard.
+
+I have been playing with DuckDB rececntly. So, I built my first dbt python model with duchdb adapter. I had a small [issue](https://github.com/duckdb/dbt-duckdb/issues/330) which got resolved super quickly thanks to [Josh Wills](https://twitter.com/josh_wills).
+
+Simply install all the dependencies in your virtualenv where you run dbt. Use [dbt docs](https://docs.getdbt.com/docs/build/python-models) to write the file with `model()` returning a single dataframe and you are done.
+
+💡: You can build dbt pipelines in a box using duckdb excel plugin which can help you connect dbt to excel and gsheet. This can be powerful to convert current setups of non-tech data people into analytics engineers.
