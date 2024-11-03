@@ -1,7 +1,6 @@
 import { Calendar } from 'lucide-react';
 import Link from 'next/link';
-import { buttonVariants } from './ui/button';
-import { cn, formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { Tag } from './tag';
 
 interface PostItemProps {
@@ -20,31 +19,43 @@ export function PostItem({
   tags
 }: PostItemProps) {
   return (
-    <article className="flex flex-col gap-2 border-border border-b py-3">
-      <div>
-        <h2 className="text-xl font-bold">
-          <Link href={'/' + slug}>{title}</Link>
-        </h2>
-      </div>
-      <div className="flex gap-2">
-        {tags?.map((tag) => <Tag tag={tag} key={tag} />)}
-      </div>
-      <div className="max-w-none text-muted-foreground">{description}</div>
-      <div className="flex justify-between items-center">
-        <dl>
-          <dt className="sr-only">Published On</dt>
-          <dd className="text-sm sm:text-base font-medium flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            <time dateTime={date}>{formatDate(date)}</time>
-          </dd>
-        </dl>
-        <Link
-          href={'/' + slug}
-          className={cn(buttonVariants({ variant: 'link' }), 'py-0')}
-        >
-          Read more →
-        </Link>
-      </div>
-    </article>
+    <Link href={'/' + slug}>
+      <article
+        className="group relative rounded-lg border p-6 shadow-md 
+        hover:shadow-lg transition-all duration-200 
+        hover:bg-accent hover:border-accent-foreground cursor-pointer"
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+          </div>
+
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <Tag tag={tag} key={tag} />
+              ))}
+            </div>
+          )}
+
+          {description && (
+            <div className="text-muted-foreground line-clamp-2">
+              {description}
+            </div>
+          )}
+
+          <div className="flex justify-between items-center pt-0">
+            <dl>
+              <dt className="sr-only">Published On</dt>
+              <dd className="text-sm font-medium flex items-center gap-1.5 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <time dateTime={date}>{formatDate(date)}</time>
+              </dd>
+            </dl>
+            <span className="text-sm font-medium">Read more →</span>
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 }

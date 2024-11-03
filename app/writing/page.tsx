@@ -1,6 +1,7 @@
 import { posts } from '#site/content';
 import { PostItem } from '@/components/post-item';
 import { QueryPagination } from '@/components/query-pagination';
+// import { ActivityCalendar } from '@/components/activity-calendar';
 import { Tag } from '@/components/tag';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAllTags, sortPosts, sortTagsByCount } from '@/lib/utils';
@@ -25,6 +26,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPage = Number(searchParams?.page) || 1;
   const sortedPosts = sortPosts(posts.filter((post) => post.published));
   const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+  // const all_posts = posts.filter((post) => post.published);
 
   const displayPosts = sortedPosts.slice(
     POSTS_PER_PAGE * (currentPage - 1),
@@ -47,11 +49,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </p>
         </div>
       </div>
+      {/* <ActivityCalendar posts={all_posts} /> */}
+      <hr className="my-8" />
       <div className="grid grid-cols-12 gap-3 mt-8">
         <div className="col-span-12 col-start-1 sm:col-span-8">
           <hr />
           {displayPosts?.length > 0 ? (
-            <ul className="flex flex-col">
+            <ul className="flex flex-col space-y-6">
               {displayPosts.map((post) => {
                 const { slug, date, title, description, tags } = post;
                 return (

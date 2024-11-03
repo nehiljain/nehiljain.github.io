@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { slug } from 'github-slugger';
 import { type Post } from '#site/content';
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -46,4 +47,32 @@ export function getPostsByTagSlug(posts: Array<Post>, tag: string) {
     const slugifiedTags = post.tags.map((tag: string) => slug(tag));
     return slugifiedTags.includes(tag);
   });
+}
+
+export function generateActivityData(posts: Array<Post>) {
+  const activityMap = new Map<string, number>();
+
+  posts.forEach((post) => {
+    if (post.published) {
+      const date = new Date(post.date).toISOString().split('T')[0];
+      activityMap.set(date, (activityMap.get(date) || 0) + 1);
+    }
+  });
+
+  // Create a date spine for the last 365 days
+  const today = new Date();
+  const dateSpine = Array.from({ length: 365 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    return date.toISOString().split('T')[0];
+  }).reverse();
+
+  // Add counts to the date spine
+  const activityData = dateSpine.map((date) => ({
+    date,
+    count: activityMap.get(date) || 0,
+    level: activityMap.get(date) ? 1 : 0
+  }));
+
+  return activityData;
 }
