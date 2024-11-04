@@ -19,7 +19,7 @@ export default function ProjectsPage() {
       <section className="grid gap-6">
         {DATA.projects.map((project, idx) => (
           <BlurFade key={project.title} delay={BLUR_FADE_DELAY * (idx + 1)}>
-            <Card className="group hover:shadow-lg transition-all">
+            <Card className="group bg-muted/40 hover:shadow-lg transition-all rounded-none border-t-2 border-t-accent border-x-0 border-b-0">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
