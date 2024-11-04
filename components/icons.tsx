@@ -7,6 +7,7 @@ import {
   Briefcase,
   Code,
   Home,
+  Pen,
   type LucideIcon
 } from 'lucide-react';
 
@@ -20,5 +21,6 @@ export const Icons = {
   mail: Mail,
   user: User,
   briefcase: Briefcase,
-  code: Code
+  code: Code,
+  pen: Pen
 } as const;

@@ -1,7 +1,6 @@
 'use client';
 
 import { DATA } from '@/data/resume';
-import { Icons } from './icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
