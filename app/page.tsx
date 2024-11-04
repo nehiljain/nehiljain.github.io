@@ -28,7 +28,7 @@ export default function Home() {
               <BlurFadeText
                 className="max-w-[600px] md:text-xl text-muted-foreground"
                 delay={BLUR_FADE_DELAY}
-                text={DATA.description}
+                text={DATA.currentFocus}
               />
             </div>
             <BlurFade delay={BLUR_FADE_DELAY}>
