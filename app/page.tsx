@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DATA } from '@/data/resume';
 import { posts } from '#site/content';
 import { PostItem } from '@/components/post-item';
-import { Card, CardContent, Badge } from '@/components/ui/card';
 
 const BLUR_FADE_DELAY = 0.04;
 
