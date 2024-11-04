@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const BLUR_FADE_DELAY = 0.04;
 
 export default function AboutPage() {
+  const featuredProjects = DATA.projects.slice(0, 3);
   return (
     <main className="container max-w-4xl mx-auto py-8 space-y-12">
       {/* Hero Section */}
@@ -143,58 +145,38 @@ export default function AboutPage() {
           </BlurFade>
         ))}
       </section>
-
-      {/* Projects Section */}
-      <section className="space-y-4">
-        <BlurFade delay={BLUR_FADE_DELAY * 16}>
+      {/* Featured Projects Section */}
+      <section id="projects" className="flex min-h-0 flex-col gap-y-3">
+        <BlurFade delay={BLUR_FADE_DELAY * 5}>
           <h2 className="text-2xl font-bold">Projects</h2>
         </BlurFade>
-        <div className="space-y-6">
-          {DATA.projects.map((project, idx) => (
-            <BlurFade key={project.title} delay={BLUR_FADE_DELAY * (17 + idx)}>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
+        <div className="grid gap-4">
+          {featuredProjects.map((project, idx) => (
+            <BlurFade key={project.title} delay={BLUR_FADE_DELAY * (6 + idx)}>
+              <Card className="group hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {project.industry} • {project.role}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          project.status === 'current' ? 'default' : 'secondary'
-                        }
-                      >
-                        {project.status}
-                      </Badge>
+                      <h3 className="font-semibold group-hover:text-primary transition-colors">
+                        {project.title}
+                      </h3>
+                      <Badge variant="secondary">{project.industry}</Badge>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {project.description}
-                      </p>
-                      {project.impact && (
-                        <p className="text-sm text-muted-foreground">
-                          {project.impact}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.map((tech) => (
-                        <Badge key={tech} variant="outline">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {project.description}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
             </BlurFade>
           ))}
         </div>
+        <Link
+          href="/projects"
+          className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
+        >
+          View All Projects →
+        </Link>
       </section>
     </main>
   );

@@ -7,11 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DATA } from '@/data/resume';
 import { posts } from '#site/content';
 import { PostItem } from '@/components/post-item';
+import { Card, CardContent, Badge } from '@/components/ui/card';
 
 const BLUR_FADE_DELAY = 0.04;
 
 export default function Home() {
   const latestPosts = sortPosts(posts).slice(0, 5);
+
   return (
     <main className="container max-w-4xl mx-auto flex flex-col min-h-[100dvh] space-y-10 py-8">
       {/* Hero Section */}
@@ -53,8 +55,8 @@ export default function Home() {
         </BlurFade>
       </section>
 
-      {/* Latest Projects Section */}
-      <section id="projects" className="flex min-h-0 flex-col gap-y-3">
+      {/* Latest Posts Section */}
+      <section id="posts" className="flex min-h-0 flex-col gap-y-3">
         <BlurFade delay={BLUR_FADE_DELAY * 7}>
           <h2 className="text-2xl font-bold">Latest Posts</h2>
         </BlurFade>
@@ -79,42 +81,6 @@ export default function Home() {
               )
           )}
         </ul>
-        {/* {latestPosts.map((post) => (
-            <BlurFade key={post.title} delay={BLUR_FADE_DELAY * (8 + idx)}>
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold">{project.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {project.industry} • {project.role}
-                        </p>
-                      </div>
-                      <Badge
-                        variant={
-                          project.status === 'current' ? 'default' : 'secondary'
-                        }
-                      >
-                        {project.status}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.technologies.slice(0, 4).map((tech) => (
-                        <Badge key={tech} variant="outline">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </BlurFade>
-          ))} */}
-
         <Link
           href="/writing"
           className={cn(buttonVariants({ variant: 'outline' }), 'mt-4')}
