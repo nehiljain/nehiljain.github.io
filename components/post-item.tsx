@@ -26,7 +26,7 @@ export function PostItem({
         href={'/' + slug}
         className="block group rounded-lg border p-4 shadow-md 
           hover:shadow-lg transition-all duration-200 
-          hover:bg-accent hover:border-accent-foreground cursor-pointer"
+          hover:bg-accent/40 hover:border-accent-foreground cursor-pointer mb-4"
       >
         <div className="space-y-2">
           <h2 className="text-xl font-bold tracking-tight">{title}</h2>
