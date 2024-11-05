@@ -1,21 +1,20 @@
+import { MainNav } from '@/components/main-nav';
+import { MobileNav } from '@/components/mobile-nav';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { buttonVariants } from './ui/button';
-import { MainNav } from './main-nav';
-import { ModeToggle } from './mode-toggle';
 import { DATA } from '@/data/resume';
-import { Icons } from './icons';
+import Link from 'next/link';
+import { Mail } from 'lucide-react';
 
 export function SiteHeader() {
-  const ContactIcon = Icons.mail;
-
   return (
-    <header className="z-10 sticky top-0 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
         <MainNav />
+        <MobileNav />
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-1">
-            {/* Social Links */}
             {Object.entries(DATA.contact.social)
               .filter(([, social]) => social.navbar)
               .map(([name, social]) => (
@@ -34,7 +33,6 @@ export function SiteHeader() {
                 </Link>
               ))}
 
-            {/* Contact Link */}
             <Link
               href={`mailto:${DATA.email}`}
               className={cn(
@@ -42,12 +40,11 @@ export function SiteHeader() {
                 'hidden sm:inline-flex'
               )}
             >
-              <ContactIcon className="h-4 w-4" />
+              <Mail className="h-4 w-4" />
               <span className="sr-only">Contact</span>
             </Link>
 
-            {/* Theme Toggle */}
-            <ModeToggle />
+            <ThemeToggle />
           </nav>
         </div>
       </div>

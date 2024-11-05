@@ -1,82 +1,89 @@
 'use client';
 
-import { useState } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
-import { Button } from './ui/button';
-import { Menu } from 'lucide-react';
-import Link, { LinkProps } from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Icons } from './icons';
-import { siteConfig } from '@/config/site';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Mail, Menu } from 'lucide-react';
+import { DATA } from '@/data/resume';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export function MobileNav() {
-  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" className="w-10 px-0 sm:hidden">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Theme</span>
+        <Button variant="ghost" className="sm:hidden">
+          <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right">
-        <MobileLink
-          onOpenChange={setOpen}
-          href="/"
-          className="flex items-center"
-        >
-          <Icons.logo className="mr-2 h-4 w-4" />
-          <span className="font-bold">{siteConfig.name}</span>
-        </MobileLink>
-        <div className="flex flex-col gap-3 mt-3">
-          <MobileLink onOpenChange={setOpen} href="/writing">
-            Writing
-          </MobileLink>
-          <MobileLink onOpenChange={setOpen} href="/about">
-            About
-          </MobileLink>
-          <Link target="_blank" rel="noreferrer" href={siteConfig.links.github}>
-            GitHub
-          </Link>
-          <Link
-            target="_blank"
-            rel="noreferrer"
-            href={siteConfig.links.twitter}
-          >
-            Twitter
-          </Link>
+      <SheetContent side="left" className="w-[300px] sm:hidden">
+        <div className="flex flex-col h-full">
+          <div className="flex-1">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={24}
+                height={24}
+                className="h-6 w-6 rounded-full"
+              />
+              <span className="font-bold">{DATA.name}</span>
+            </Link>
+            <nav className="mt-4 flex flex-col space-y-3">
+              {DATA.navbar.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'text-sm font-medium transition-colors hover:text-primary',
+                    pathname === item.href
+                      ? 'text-foreground'
+                      : 'text-foreground/60'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <div className="border-t py-4">
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(DATA.contact.social).map(([name, social]) => (
+                <Link
+                  key={name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(
+                    buttonVariants({
+                      variant: 'ghost',
+                      size: 'sm'
+                    })
+                  )}
+                >
+                  <social.icon className="h-4 w-4 mr-2" />
+                  {social.label}
+                </Link>
+              ))}
+              <Link
+                href={`mailto:${DATA.email}`}
+                className={cn(
+                  buttonVariants({
+                    variant: 'ghost',
+                    size: 'sm'
+                  })
+                )}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Contact
+              </Link>
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
-  );
-}
-
-interface MobileLinkProps extends LinkProps {
-  children: React.ReactNode;
-  onOpenChange?: (open: boolean) => void;
-  className?: string;
-}
-
-function MobileLink({
-  href,
-  onOpenChange,
-  children,
-  className,
-  ...props
-}: MobileLinkProps) {
-  const router = useRouter();
-  return (
-    <Link
-      href={href}
-      onClick={() => {
-        router.push(href.toString());
-        onOpenChange?.(false);
-      }}
-      className={className}
-      {...props}
-    >
-      {children}
-    </Link>
   );
 }
