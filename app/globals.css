@@ -74,3 +74,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Single rule for tweet images */
+.prose .tweet-wrapper img {
+  margin: 0 !important;
+}

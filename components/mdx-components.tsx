@@ -4,6 +4,7 @@ import Image from 'next/image';
 import * as runtime from 'react/jsx-runtime';
 import { Callout } from './callout';
 import { YouTube } from '@/components/youtube';
+import { Tweet } from 'react-tweet';
 
 const useMDXComponent = (code: string) => {
   const fn = new Function(code);
@@ -13,7 +14,12 @@ const useMDXComponent = (code: string) => {
 const components = {
   Image,
   Callout,
-  YouTube: YouTube
+  YouTube,
+  Tweet: (props: any) => (
+    <div className="flex justify-center my-4 tweet-wrapper">
+      <Tweet {...props} />
+    </div>
+  )
 };
 
 interface MdxProps {
