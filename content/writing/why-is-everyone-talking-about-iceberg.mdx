@@ -69,6 +69,11 @@ In the GIF above you can see how different snapshots are created for the writes 
 
 No global locks; writers only fail when they touch the *same* rows. Spark, Flink, and Trino all leverage this commit model out of the box.
 
+There are two main ways you can do row-level changes (CRUD): 
+
+- **Copy-on-Write (COW)**: When you run an UPDATE, DELETE, or MERGE, Iceberg rewrites the affected data files. This means your table always reflects the latest state in-place, and queries don’t need to merge data at read time. It’s simple and great for batch workloads, but can be more I/O intensive for frequent updates.
+- **Merge-on-Read (MOR)**: Here, updates and deletes are written as new “delta” files, and the actual merging happens when you read the data. This is more efficient for high-velocity, streaming, or CDC workloads, since you avoid rewriting big files on every change. The tradeoff: reads have to do a bit more work to stitch together the latest view.
+
 ### **Iceberg will hide your partitions and evolve your schema without data rewrites**
 
 I used to spend weekends manually reorganizing Hive partitions—renaming folders, running `msck repair`, hoping queries wouldn't break. With Iceberg, partitions live in metadata, not directory names. 
