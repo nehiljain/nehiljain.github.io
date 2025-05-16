@@ -30,7 +30,7 @@ Fast‑forward to 2025:
 - **Open table formats add ACID.** Iceberg / Delta / Hudi layer transactions + schema evolution straight on Parquet.
 - **Multi‑engine, self‑serve SQL.** Spark, Flink, Trino, DuckDB, Snowflake all query the same tables—no `msck repair`, no weekend fire‑drills.
 
-**My take:** You're not just picking file layouts anymore—you're choosing the single source of truth your whole data stack will trust. The ultimate goal here is to build a data lake that can be queried from all the different compute engines (Spark, Snowflake, Flink, Trino, DuckDB, etc.)
+> **My take:** You're not just picking file layouts anymore—you're choosing the single source of truth your whole data stack will trust. The ultimate goal here is to build a data lake that can be queried from all the different compute engines (Spark, Snowflake, Flink, Trino, DuckDB, etc.)
 
 
 
@@ -67,12 +67,14 @@ New data files *and* a brand-new snapshot are created for every new write. Metad
 
 In the GIF above you can see how different snapshots are created for the writes coming in.
 
-No global locks; writers only fail when they touch the *same* rows. Spark, Flink, and Trino all leverage this commit model out of the box.
+
 
 There are two main ways you can do row-level changes (CRUD): 
 
 - **Copy-on-Write (COW)**: When you run an UPDATE, DELETE, or MERGE, Iceberg rewrites the affected data files. This means your table always reflects the latest state in-place, and queries don’t need to merge data at read time. It’s simple and great for batch workloads, but can be more I/O intensive for frequent updates.
 - **Merge-on-Read (MOR)**: Here, updates and deletes are written as new “delta” files, and the actual merging happens when you read the data. This is more efficient for high-velocity, streaming, or CDC workloads, since you avoid rewriting big files on every change. The tradeoff: reads have to do a bit more work to stitch together the latest view.
+
+> **My takeaway:** No global locks; writers only fail when they touch the *same* rows. Spark, Flink, and Trino all leverage this commit model out of the box.
 
 ### **Iceberg will hide your partitions and evolve your schema without data rewrites**
 
@@ -104,7 +106,7 @@ Here's what that unlocks:
 2. **Real-world change is messy—partitions shift constantly.** Content launches in new countries, user cohorts evolve, data schemas expand. You can now easily add or modify partition fields dozens of times without downtime or backfills. Iceberg handles the mix of old and new partitions transparently.
 3. **Query pruning stays razor-sharp.** Even if your SQL omits `region`, the engine still consults the metadata to skip irrelevant files, just like it would for `event_ts`. That means performance doesn't regress as your partition strategy evolves.
 
-**Why it matters:** Experienced engineers know that partition churn is inevitable. Hidden, metadata-driven partitions with Iceberg's dynamic spec mean you can iterate on your data model, without painful rebuilds or weekend firefights.
+> **Why it matters:** Experienced engineers know that partition churn is inevitable. Hidden, metadata-driven partitions with Iceberg's dynamic spec mean you can iterate on your data model, without painful rebuilds or weekend firefights.
 
 ### **Point-in-Time queries made easy with time-travel snapshots**
 
@@ -139,7 +141,7 @@ But, that's not the whole picture, here is how I look at it.
 | Micro-batch CDC & merges | Real-time upserts + change feeds | Hudi / Delta |
 | Databricks-native | Integrated with DBFS & Unity Catalog | Delta Lake |
 
-**My take:** No single format rules them all—match tool to task. For most streaming analytics, Iceberg's openness and agile partitions win. But for ultra-low-latency CDC or tight Databricks integration, Hudi or Delta still shine.
+> **My take:** No single format rules them all—match tool to task. For most streaming analytics, Iceberg's openness and agile partitions win. But for ultra-low-latency CDC or tight Databricks integration, Hudi or Delta still shine.
 
 
 If you made it this far, its only fair I show you an example implementation to ground your theoretical understanding of Iceberg.
