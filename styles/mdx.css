@@ -37,3 +37,7 @@
 .subheading-anchor {
   @apply no-underline hover:underline;
 }
+
+.prose {
+  font-size: 19px;
+}
