@@ -371,13 +371,13 @@ Cost angles:
 - Biggest spend is still **read I/O**; schedule weekly `rewrite_data_files` + `compact` to keep file sizes sweet-spot (256 MB).
 - Resist the urge to bucket by *every* dimension—Iceberg stats already prune aggressively.
 
-My Takeaway: Iceberg is fastest for large, append-only analytics; Delta/Hudi gain edge once your workload hammers a lot of updates.
+> **My Takeaway**: Iceberg is fastest for large, append-only analytics; Delta/Hudi gain edge once your workload hammers a lot of updates.
 
 Iceberg delivers warehouse-class **reliability**, **schema flexibility**, and **time travel**—without shackling you to a closed ecosystem. It also has the highest levels of support in the data platform ecosystem.
 Iceberg actually just makes the lakehouse promise a reality. Lakehouse architectures will finally be stable enough to trust in production. That's exciting!
 
 
-Recommended resources for learning more:
+## Recommended resources for learning more:
 
 1. [Apache Iceberg: An Architectural Look Under the Covers](https://www.dremio.com/resources/guides/apache-iceberg-an-architectural-look-under-the-covers/)
 2. [Apache Iceberg Architecture Dive Deep](https://relentless-leader.com/apache-iceberg-internals-dive-deep.html)
