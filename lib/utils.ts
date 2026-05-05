@@ -1,8 +1,12 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { slug } from 'github-slugger';
-import { type Post } from '#site/content';
+import { type Post, type Link } from '#site/content';
 import readingTime from 'reading-time';
+
+type Taggable = { date: string; tags?: string[]; published: boolean };
+type Datable = { date: string };
+type SluggableTaggable = { tags?: string[] };
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -16,19 +20,19 @@ export function formatDate(date: string) {
   });
 }
 
-export function sortPosts(posts: Array<Post>) {
-  return posts.sort((a, b) => {
+export function sortPosts<T extends Datable>(items: Array<T>): Array<T> {
+  return items.sort((a, b) => {
     if (a.date > b.date) return -1;
     if (a.date < b.date) return 1;
     return 0;
   });
 }
 
-export function getAllTags(posts: Array<Post>) {
+export function getAllTags(items: Array<Taggable>) {
   const tags: Record<string, number> = {};
-  posts.forEach((post) => {
-    if (post.published) {
-      post.tags?.forEach((tag: string) => {
+  items.forEach((item) => {
+    if (item.published) {
+      item.tags?.forEach((tag: string) => {
         tags[tag] = (tags[tag] ?? 0) + 1;
       });
     }
@@ -41,10 +45,13 @@ export function sortTagsByCount(tags: Record<string, number>) {
   return Object.keys(tags).sort((a, b) => tags[b] - tags[a]);
 }
 
-export function getPostsByTagSlug(posts: Array<Post>, tag: string) {
-  return posts.filter((post) => {
-    if (!post.tags) return false;
-    const slugifiedTags = post.tags.map((tag: string) => slug(tag));
+export function getPostsByTagSlug<T extends SluggableTaggable>(
+  items: Array<T>,
+  tag: string
+): Array<T> {
+  return items.filter((item) => {
+    if (!item.tags) return false;
+    const slugifiedTags = item.tags.map((t: string) => slug(t));
     return slugifiedTags.includes(tag);
   });
 }
