@@ -25,6 +25,30 @@ const posts = defineCollection({
     .transform(computedFields)
 });
 
+const links = defineCollection({
+  name: 'Link',
+  pattern: 'links/**/*.mdx',
+  schema: s
+    .object({
+      slug: s.path(),
+      title: s.string().max(160),
+      url: s.string().url(),
+      date: s.isodate(),
+      via: s.string().url().optional(),
+      author: s.string().optional(),
+      description: s.string().max(280).optional(),
+      tags: s.array(s.string()).optional(),
+      published: s.boolean().default(true),
+      body: s.mdx()
+    })
+    .transform((data) => {
+      // posts: drop 'writing/' prefix; links: also strip the YYYY-MM-DD- date.
+      const after = data.slug.split('/').slice(1).join('/');
+      const slugAsParams = after.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+      return { ...data, slugAsParams };
+    })
+});
+
 export default defineConfig({
   root: 'content',
   output: {
@@ -34,7 +58,7 @@ export default defineConfig({
     name: '[name]-[hash:6].[ext]',
     clean: true
   },
-  collections: { posts },
+  collections: { posts, links },
   mdx: {
     rehypePlugins: [
       rehypeSlug,
