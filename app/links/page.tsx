@@ -48,7 +48,7 @@ export default async function LinksPage({ searchParams }: LinksPageProps) {
       <div className="grid grid-cols-12 gap-3 mt-8">
         <div className="col-span-12 col-start-1 sm:col-span-8">
           {display.length > 0 ? (
-            <ul className="flex flex-col">
+            <ul className="flex flex-col gap-3">
               {display.map((link: any) => (
                 <li key={link.slug}>
                   <LinkPostItem
@@ -58,6 +58,7 @@ export default async function LinksPage({ searchParams }: LinksPageProps) {
                     date={link.date}
                     url={link.url}
                     description={link.description}
+                    author={link.author}
                     via={link.via}
                     tags={link.tags}
                   />

@@ -65,6 +65,7 @@ export default function TagPage({ params }: TagPageProps) {
                       date={item.date}
                       url={item.url}
                       description={item.description}
+                      author={item.author}
                       via={item.via}
                       tags={item.tags}
                     />

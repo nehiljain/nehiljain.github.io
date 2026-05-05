@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Calendar, Link2 } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Tag } from '@/components/tag';
 import { extractDomain } from '@/lib/url';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 interface LinkPostItemProps {
   slug: string;
@@ -11,6 +12,7 @@ interface LinkPostItemProps {
   date: string;
   url: string;
   description?: string;
+  author?: string;
   via?: string;
   tags?: string[];
 }
@@ -21,54 +23,90 @@ export function LinkPostItem({
   date,
   url,
   description,
+  author,
   via,
   tags
 }: LinkPostItemProps) {
+  const domain = extractDomain(url);
+  const viaDomain = via ? extractDomain(via) : '';
+
   return (
-    <article className="flex flex-col gap-2 border-b border-border py-5">
-      <h3 className="text-xl font-semibold leading-snug">
+    <article
+      className={cn(
+        'group relative rounded-xl border border-border bg-card',
+        'p-5 sm:p-6 transition-all',
+        'hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5',
+        'focus-within:border-primary/50 focus-within:shadow-md'
+      )}
+    >
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <Badge variant="outline" className="font-normal text-muted-foreground">
+          {domain}
+        </Badge>
+        <time
+          dateTime={date}
+          className="text-xs text-muted-foreground tabular-nums"
+        >
+          {formatDate(date)}
+        </time>
+      </div>
+
+      <h3 className="text-lg sm:text-xl font-semibold leading-snug tracking-tight">
         <Link
           href={`/links/${slugAsParams}`}
-          className="hover:underline decoration-primary/40 underline-offset-4"
+          className="before:absolute before:inset-0 focus:outline-none"
         >
-          <Link2 className="inline-block h-4 w-4 mr-1 -mt-0.5 text-muted-foreground" />
-          {title}
+          <span
+            className={cn(
+              'bg-gradient-to-r from-primary to-primary',
+              'bg-[length:0%_2px] bg-no-repeat',
+              'transition-[background-size] duration-300',
+              'group-hover:bg-[length:100%_2px]'
+            )}
+            style={{ backgroundPosition: '0 100%' }}
+          >
+            {title}
+          </span>
+          <ArrowUpRight
+            className={cn(
+              'inline-block h-4 w-4 ml-1 -mt-1 text-muted-foreground',
+              'transition-transform duration-200',
+              'group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary'
+            )}
+          />
         </Link>
       </h3>
-      {description ? (
-        <p className="text-muted-foreground">{description}</p>
-      ) : null}
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          <time dateTime={date}>{formatDate(date)}</time>
-        </span>
-        <span>·</span>
-        <span>{extractDomain(url)}</span>
-        {via && (
-          <>
-            <span>·</span>
-            <a
-              href={via}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              via
-            </a>
-          </>
-        )}
-        {tags && tags.length > 0 && (
-          <>
-            <span>·</span>
-            <div className="flex flex-wrap gap-1">
-              {tags.map((tag) => (
-                <Tag tag={tag} key={tag} />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+
+      {author && (
+        <p className="mt-1 text-sm text-muted-foreground">by {author}</p>
+      )}
+
+      {description && (
+        <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed line-clamp-3">
+          {description}
+        </p>
+      )}
+
+      {(tags?.length || via) && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 relative z-10">
+          {tags?.map((t) => (
+            <Tag key={t} tag={t} />
+          ))}
+          {via && (
+            <span className="text-xs text-muted-foreground ml-auto">
+              via{' '}
+              <a
+                href={via}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-2 hover:underline"
+              >
+                {viaDomain || 'source'}
+              </a>
+            </span>
+          )}
+        </div>
+      )}
     </article>
   );
 }
