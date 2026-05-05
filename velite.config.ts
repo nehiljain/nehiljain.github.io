@@ -3,10 +3,12 @@ import rehypeSlug from 'rehype-slug';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-const computedFields = <T extends { slug: string }>(data: T) => ({
-  ...data,
-  slugAsParams: data.slug.split('/').slice(1).join('/')
-});
+// posts: drop the collection prefix (e.g. 'writing/'); links: also strip the YYYY-MM-DD- date prefix.
+const stripCollectionPrefix = (slug: string) =>
+  slug.split('/').slice(1).join('/');
+
+const stripDatePrefix = (s: string) =>
+  s.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 
 const posts = defineCollection({
   name: 'Post',
@@ -22,7 +24,10 @@ const posts = defineCollection({
       body: s.mdx(),
       code: s.mdx()
     })
-    .transform(computedFields)
+    .transform((data) => ({
+      ...data,
+      slugAsParams: stripCollectionPrefix(data.slug)
+    }))
 });
 
 const links = defineCollection({
@@ -41,12 +46,10 @@ const links = defineCollection({
       published: s.boolean().default(true),
       body: s.mdx()
     })
-    .transform((data) => {
-      // posts: drop 'writing/' prefix; links: also strip the YYYY-MM-DD- date.
-      const after = data.slug.split('/').slice(1).join('/');
-      const slugAsParams = after.replace(/^\d{4}-\d{2}-\d{2}-/, '');
-      return { ...data, slugAsParams };
-    })
+    .transform((data) => ({
+      ...data,
+      slugAsParams: stripDatePrefix(stripCollectionPrefix(data.slug))
+    }))
 });
 
 export default defineConfig({
