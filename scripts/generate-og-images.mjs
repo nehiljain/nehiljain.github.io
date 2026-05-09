@@ -36,9 +36,9 @@ async function readSiteUrl() {
   return match[1];
 }
 
-async function readManifest() {
+async function readManifest(manifestPath = MANIFEST_PATH) {
   try {
-    const raw = await fs.readFile(MANIFEST_PATH, 'utf8');
+    const raw = await fs.readFile(manifestPath, 'utf8');
     return JSON.parse(raw);
   } catch (err) {
     if (err.code === 'ENOENT') return {};
@@ -65,7 +65,7 @@ export async function generate({
   const postsRaw = await fs.readFile(veliteOut, 'utf8');
   const posts = JSON.parse(postsRaw);
   await fs.mkdir(ogDir, { recursive: true });
-  const manifest = await readManifest();
+  const manifest = await readManifest(manifestPath);
   const newManifest = {};
   let written = 0;
   let skipped = 0;
