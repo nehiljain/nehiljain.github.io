@@ -1445,11 +1445,85 @@ Expected: PR shows the spec doc + all implementation commits. CI checks (if any 
 
 ---
 
+## Task 24: Domain migration — GoDaddy registrar, DNS to Cloudflare (manual)
+
+`nehiljain.com` is registered at GoDaddy and currently resolves to Vercel. We move authoritative DNS to Cloudflare while keeping GoDaddy as the registrar — no transfer-of-registration. Cloudflare gets full DNS control (apex CNAME flattening, automatic SSL, WAF-ready); the registration is unchanged.
+
+Alternative path (keep DNS at GoDaddy and just point at Cloudflare Pages) is rejected because GoDaddy's free DNS doesn't support apex CNAMEs.
+
+**Files:** None — entirely external infrastructure work.
+
+- [ ] **Step 1: Inventory current DNS at GoDaddy**
+
+Save this output for cross-checking after import:
+
+```bash
+dig nehiljain.com A +short
+dig nehiljain.com NS +short
+dig nehiljain.com MX +short
+dig nehiljain.com TXT +short
+dig www.nehiljain.com CNAME +short
+```
+
+- [ ] **Step 2: Add the site to Cloudflare**
+
+1. https://dash.cloudflare.com/ → **Add a Site** → enter `nehiljain.com` → **Free** plan.
+2. Cloudflare scans GoDaddy DNS and imports records. **Cross-check imported records against the Step 1 output.** Add anything missing — most commonly email TXT records (SPF, DKIM, DMARC).
+3. Cloudflare assigns two nameservers (e.g. `xxx.ns.cloudflare.com`, `yyy.ns.cloudflare.com`). Capture them.
+
+- [ ] **Step 3: Switch nameservers at GoDaddy**
+
+1. https://dcc.godaddy.com/control/portfolio → click `nehiljain.com` → **Domain Settings → Nameservers → Change Nameservers** → "I'll use my own nameservers".
+2. Replace GoDaddy's defaults with Cloudflare's two NS records.
+3. Save. Propagation: typically <1 hour, max 48 hours.
+
+Verify:
+```bash
+dig nehiljain.com NS +short
+# Should return Cloudflare's nameservers, not GoDaddy's
+```
+
+In Cloudflare dashboard, the site flips from **Pending** to **Active** once it sees the new nameservers.
+
+- [ ] **Step 4: Attach the custom domain to Cloudflare Pages**
+
+1. https://dash.cloudflare.com/<cloudflare-account-id>/pages/view/nehiljain-com → **Custom domains → Set up a custom domain** → `nehiljain.com`.
+2. Cloudflare creates the CNAME (with apex flattening) and provisions an SSL cert (~5 minutes).
+3. Repeat for `www.nehiljain.com`. Optionally configure a www→apex (or apex→www) redirect via Cloudflare Rules → Redirect Rules.
+
+Verify:
+```bash
+curl -sI https://nehiljain.com | head -5
+# Expect HTTP/2 200, server: cloudflare
+
+SLUG=$(node -e "console.log(require('./.velite/posts.json').find(p=>p.published).slugAsParams)")
+curl -sI "https://nehiljain.com/og/$SLUG.png" | head -5
+# Expect HTTP/2 200, content-type: image/png
+
+E2E_BASE_URL=https://nehiljain.com pnpm test:e2e:prod
+# Expect 8 passing
+```
+
+- [ ] **Step 5: Decommission Vercel**
+
+Wait until `https://nehiljain.com` has been serving cleanly from Cloudflare for **≥24 hours**. Then:
+
+1. Vercel dashboard → project → **Domains** → remove `nehiljain.com` and `www.nehiljain.com`.
+2. Vercel dashboard → project → **Settings → General → Delete Project**.
+3. Cancel any paid Vercel plan if applicable.
+
+- [ ] **Step 6: No code changes required**
+
+`siteMetadata.siteUrl` in `config/metadata.ts` is already `https://nehiljain.com`. The Pages build uses `process.env.CF_PAGES_URL` for previews and falls back to `siteMetadata.siteUrl` for production, so once the custom domain is attached, OG image absolute URLs resolve correctly without any redeploy.
+
+---
+
 ## Self-Review Notes
 
-- **Spec coverage:** Every spec section (Decisions, Architecture, Components 1-6, Cloudflare Pages config, Verification plan, Rollback) maps to at least one task. Task 19-22 cover the Cloudflare Pages config; Task 22 is the only manual step (per user's confirmation that dashboard GitHub linkage is fine to do in UI).
-- **Out-of-scope items** (custom domain, Web Analytics, `_headers`/`_redirects`, removing Vercel, OpenNext) are not included — matches spec.
+- **Spec coverage:** Every spec section (Decisions, Architecture, Components 1-6, Cloudflare Pages config, Verification plan, Rollback) maps to at least one task. Task 19-22 cover the Cloudflare Pages config; Task 22 is the GitHub auto-deploy hookup (manual). Task 24 (added post-implementation) covers the GoDaddy → Cloudflare DNS move.
+- **Out-of-scope items deferred to Task 24** (originally "out of scope per spec"): custom domain mapping, decommissioning Vercel. The user requested these be added as manual instructions after the initial implementation landed.
+- **Out-of-scope items still excluded:** Web Analytics, `_headers`/`_redirects`, `@opennextjs/cloudflare` migration.
 - **Bug fix** (`config/site.ts` placeholder URL) is folded into the OG generation script and explicitly tested in Task 10.
-- **Rollback** is implicitly preserved: Vercel keeps running, all changes are git-revertable, and the deleted OG route lives in history.
+- **Rollback** is implicitly preserved: Vercel keeps running until the user removes it manually (Task 24 Step 5), all changes are git-revertable, and the deleted OG route lives in history.
 - **Risk: Node TS import.** Task 9 Step 2 has a fallback to `tsx` if the user's Node version doesn't support TS imports natively. This is a runtime check, not a guess.
 - **Risk: `metadata.ts` export name.** Task 13 Step 1 instructs the executor to verify the actual export name with `grep` rather than assume. The plan defaults to `metadata` but flags this.
