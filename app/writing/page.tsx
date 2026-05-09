@@ -1,6 +1,5 @@
 import { posts } from '#site/content';
 import { PostItem } from '@/components/post-item';
-import { QueryPagination } from '@/components/query-pagination';
 // import { ActivityCalendar } from '@/components/activity-calendar';
 import { Tag } from '@/components/tag';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,24 +13,10 @@ export const metadata: Metadata = {
     'Experiments, TILs, Notes about AI, Data Infrastructure, Startups ...'
 };
 
-const POSTS_PER_PAGE = 5;
-
-interface BlogPageProps {
-  searchParams: {
-    page?: string;
-  };
-}
-
-export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const currentPage = Number(searchParams?.page) || 1;
-  const sortedPosts = sortPosts(posts.filter((post) => post.published));
-  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
-  // const all_posts = posts.filter((post) => post.published);
-
-  const displayPosts = sortedPosts.slice(
-    POSTS_PER_PAGE * (currentPage - 1),
-    POSTS_PER_PAGE * currentPage
-  );
+export default async function BlogPage() {
+  // Static export: all posts on a single page (no searchParams pagination,
+  // which is incompatible with `output: 'export'`).
+  const displayPosts = sortPosts(posts.filter((post) => post.published));
 
   const tags = getAllTags(posts);
   const sortedTags = sortTagsByCount(tags);
@@ -75,10 +60,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           ) : (
             <p>Nothing to see here yet</p>
           )}
-          <QueryPagination
-            totalPages={totalPages}
-            className="justify-end mt-4"
-          />
         </div>
         <Card className="col-span-12 row-start-3 h-fit sm:col-span-4 sm:col-start-9 sm:row-start-1">
           <CardHeader>

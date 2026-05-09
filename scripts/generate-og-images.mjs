@@ -63,7 +63,12 @@ export async function generate({
   const siteUrl = siteUrlOverride ?? (await readSiteUrl());
   const renderOgPng = await getRenderOgPng();
   const postsRaw = await fs.readFile(veliteOut, 'utf8');
-  const posts = JSON.parse(postsRaw);
+  // Only render OG images for posts that will actually be exported.
+  // Unpublished posts are filtered out by generateStaticParams in
+  // app/writing/[...slug]/page.tsx, so their PNGs would be orphaned.
+  const posts = JSON.parse(postsRaw).filter(
+    (p) => p.published === undefined || p.published
+  );
   await fs.mkdir(ogDir, { recursive: true });
   const manifest = await readManifest(manifestPath);
   const newManifest = {};

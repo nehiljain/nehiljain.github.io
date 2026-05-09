@@ -26,7 +26,10 @@ export async function renderOgPng(props: OgCardProps): Promise<Buffer> {
   // the VDOM satori expects. We render the React component to static markup
   // first, then hand the resulting string to satori-html.
   const markup = renderToStaticMarkup(React.createElement(OgCard, props));
-  const vdom = html(markup);
+  // satori-html's html() returns a VNode shaped exactly like satori's
+  // expected input, but the types don't align with satori's React-flavored
+  // signature. Cast through unknown to satisfy the compiler.
+  const vdom = html(markup) as unknown as React.ReactElement;
   const svg = await satori(vdom, {
     width: 1200,
     height: 630,
