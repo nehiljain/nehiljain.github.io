@@ -37,3 +37,6 @@ next-env.d.ts
 
 # velite files
 .velite
+
+# generated OG images
+/public/og/
