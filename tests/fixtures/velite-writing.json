@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "writing/hello-world",
+    "slugAsParams": "hello-world",
+    "title": "Hello World",
+    "description": "First fixture post",
+    "date": "2024-01-01",
+    "published": true,
+    "tags": ["test"]
+  },
+  {
+    "slug": "writing/longer-post",
+    "slugAsParams": "longer-post",
+    "title": "A longer fixture post about distributed systems and embedding pipelines",
+    "description": "Second fixture post",
+    "date": "2024-02-01",
+    "published": true,
+    "tags": ["test"]
+  }
+]
