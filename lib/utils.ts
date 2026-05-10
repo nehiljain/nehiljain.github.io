@@ -9,10 +9,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(date: string) {
+  // Pin timezone to UTC so server-side build output matches client hydration
+  // regardless of the visitor's local timezone.
   return new Date(date).toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'
   });
 }
 

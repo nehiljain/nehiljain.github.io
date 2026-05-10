@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import '@/styles/mdx.css';
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { siteMetadata } from '@/config/metadata';
 import { Tag } from '@/components/tag';
 import { Calendar, Circle } from 'lucide-react';
 import { formatDate, getReadingTime } from '@/lib/utils';
@@ -31,8 +32,8 @@ export async function generateMetadata({
     return {};
   }
 
-  const ogSearchParams = new URLSearchParams();
-  ogSearchParams.set('title', post.title);
+  const baseUrl = process.env.CF_PAGES_URL ?? siteMetadata.siteUrl;
+  const ogUrl = `${baseUrl}/og/${post.slugAsParams}.png`;
 
   return {
     title: post.title,
@@ -45,7 +46,7 @@ export async function generateMetadata({
       url: post.slug,
       images: [
         {
-          url: `/api/og?${ogSearchParams.toString()}`,
+          url: ogUrl,
           width: 1200,
           height: 630,
           alt: post.title
@@ -56,7 +57,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: [`/api/og?${ogSearchParams.toString()}`]
+      images: [ogUrl]
     }
   };
 }
@@ -64,7 +65,9 @@ export async function generateMetadata({
 export async function generateStaticParams(): Promise<
   PostPageProps['params'][]
 > {
-  return posts.map((post) => ({ slug: post.slugAsParams.split('/') }));
+  return posts
+    .filter((post) => post.published)
+    .map((post) => ({ slug: post.slugAsParams.split('/') }));
 }
 
 export default async function PostPage({ params }: PostPageProps) {
