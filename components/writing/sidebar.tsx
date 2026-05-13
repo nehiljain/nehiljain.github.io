@@ -1,5 +1,3 @@
-'use client';
-
 import { inferKind } from '@/lib/utils';
 import type { EditorialPost } from '@/components/writing/editorial-row';
 
@@ -88,24 +86,6 @@ export function WritingSidebar({ posts }: { posts: EditorialPost[] }) {
             </span>
           ))}
         </div>
-      </SidebarCard>
-
-      <SidebarCard title="Subscribe">
-        <div className="mb-2.5 text-[13px] leading-snug text-muted-foreground">
-          Roughly monthly. Notes from production, no marketing.
-        </div>
-        <form className="flex gap-1.5" onSubmit={(e) => e.preventDefault()}>
-          <input
-            placeholder="you@email.com"
-            className="min-w-0 flex-1 rounded-lg border border-rule bg-background px-2.5 py-2 text-xs text-foreground outline-none"
-          />
-          <button
-            type="submit"
-            className="rounded-lg bg-accent px-3 py-2 font-heading text-xs font-bold text-accent-foreground"
-          >
-            Subscribe
-          </button>
-        </form>
       </SidebarCard>
     </aside>
   );
