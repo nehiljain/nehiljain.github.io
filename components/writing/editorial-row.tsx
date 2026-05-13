@@ -22,12 +22,8 @@ export function EditorialRow({ post, index, accent = false }: Props) {
   return (
     <Link
       href={'/' + post.slug}
-      className="group relative grid grid-cols-[52px_1fr_200px] items-start gap-6 border-t border-rule/40 py-6 no-underline text-foreground transition-colors duration-200 hover:border-rule/80"
+      className="group grid grid-cols-[52px_1fr_200px] items-start gap-6 border-t border-rule/40 py-6 no-underline text-foreground"
     >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-px h-px origin-left scale-x-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-x-100"
-      />
       <div className="pt-1 font-mono text-[11px] font-semibold tracking-wide text-muted-foreground transition-colors duration-200 group-hover:text-accent">
         {String(index + 1).padStart(2, '0')}
       </div>
