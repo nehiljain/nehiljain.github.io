@@ -22,9 +22,13 @@ export function EditorialRow({ post, index, accent = false }: Props) {
   return (
     <Link
       href={'/' + post.slug}
-      className="grid grid-cols-[52px_1fr_200px] items-start gap-6 border-t border-rule/40 py-6 no-underline text-foreground"
+      className="group relative grid grid-cols-[52px_1fr_200px] items-start gap-6 border-t border-rule/40 py-6 no-underline text-foreground transition-colors duration-200 hover:border-rule/80"
     >
-      <div className="pt-1 font-mono text-[11px] font-semibold tracking-wide text-muted-foreground">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-px h-px origin-left scale-x-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-x-100"
+      />
+      <div className="pt-1 font-mono text-[11px] font-semibold tracking-wide text-muted-foreground transition-colors duration-200 group-hover:text-accent">
         {String(index + 1).padStart(2, '0')}
       </div>
       <div className="min-w-0">
@@ -37,8 +41,16 @@ export function EditorialRow({ post, index, accent = false }: Props) {
             ))}
           </div>
         )}
-        <h3 className="m-0 font-heading text-[28px] font-semibold leading-tight tracking-tight text-foreground">
-          {post.title}
+        <h3 className="m-0 inline-flex items-baseline gap-2 font-heading text-[28px] font-semibold leading-tight tracking-tight text-foreground transition-colors duration-200 group-hover:text-accent">
+          <span className="bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 ease-out group-hover:bg-[length:100%_2px]">
+            {post.title}
+          </span>
+          <span
+            aria-hidden
+            className="translate-x-[-4px] text-accent opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+          >
+            <Icon.ArrowUpRight size={20} />
+          </span>
         </h3>
         {post.description && (
           <p className="mt-2 max-w-[620px] text-base leading-relaxed text-muted-foreground">
