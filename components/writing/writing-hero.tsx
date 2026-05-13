@@ -1,26 +1,20 @@
-import { NJMark } from '@/components/brand/nj-mark';
 import { Icon } from '@/components/brand/icon';
 
 export function WritingHero({ count }: { count: number }) {
   return (
-    <section className="flex items-end justify-between gap-8 border-b border-dashed border-rule pb-7">
-      <div className="flex-1">
-        <div className="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.13em] text-muted-foreground">
-          <Icon.Writing size={14} fill="hsl(var(--accent))" />
-          The Writing Index · {count} posts
-        </div>
-        <h1 className="m-0 font-heading text-6xl font-semibold leading-[1.0] tracking-tight text-foreground lg:text-[84px]">
-          Notes from the field<span className="text-accent">.</span>
-        </h1>
-        <p className="mt-3.5 max-w-[640px] text-[19px] leading-snug text-muted-foreground">
-          Experiments, TILs, retros, and sketchnotes on AI infra, data
-          engineering, and the unglamorous bits of making AI reliable in
-          production.
-        </p>
+    <section className="border-b border-dashed border-rule pb-7">
+      <div className="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.13em] text-muted-foreground">
+        <Icon.Writing size={14} fill="hsl(var(--accent))" />
+        The Writing Index · {count} posts
       </div>
-      <div className="relative hidden md:block">
-        <NJMark size={88} tilt={6} />
-      </div>
+      <h1 className="m-0 font-heading text-6xl font-semibold leading-[1.0] tracking-tight text-foreground lg:text-[84px]">
+        Notes from the field<span className="text-accent">.</span>
+      </h1>
+      <p className="mt-3.5 max-w-[640px] text-[19px] leading-snug text-muted-foreground">
+        Experiments, TILs, retros, and sketchnotes on AI infra, data
+        engineering, and the unglamorous bits of making AI reliable in
+        production.
+      </p>
     </section>
   );
 }
