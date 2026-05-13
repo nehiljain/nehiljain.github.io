@@ -20,7 +20,11 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', ...fontFamily.sans]
+        display: ['var(--font-display)', 'sans-serif'],
+        heading: ['var(--font-heading)', 'sans-serif'],
+        sans: ['var(--font-sans)', ...fontFamily.sans],
+        mono: ['var(--font-mono)', ...fontFamily.mono],
+        script: ['var(--font-script)', 'cursive'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -55,7 +59,17 @@ const config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
-        }
+        },
+        rule: 'hsl(var(--rule))',
+        paper: 'hsl(var(--paper))',
+        'paper-ink': 'hsl(var(--paper-ink))',
+        'accent-soft': 'hsl(var(--accent-soft))',
+      },
+      maxWidth: {
+        'content': '1080px',
+        'nav': '1180px',
+        'prose-tight': '720px',
+        'prose-wide': '760px',
       },
       borderRadius: {
         lg: 'var(--radius)',
