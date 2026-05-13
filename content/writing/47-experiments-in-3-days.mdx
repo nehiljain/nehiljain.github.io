@@ -1,6 +1,6 @@
 ---
 title: '47 experiments in 3 days: I let Claude Code optimize a Ray Data pipeline while I was on Zoom calls'
-description: "A customer's batch embeddings pipeline was crashing at 10M rows. 47 autonomous scored experiments later, it shipped 3.2× faster on 60% fewer GPUs."
+description: "A customer's batch embeddings pipeline was crashing at 10M rows. 47 autonomous experiments later, it shipped 3.2× faster on 60% fewer GPUs."
 date: 2026-05-12
 tags: ['anyscale', 'ray', 'ai-agents', 'optimization']
 published: true
@@ -32,11 +32,11 @@ I wrote it down as a workflow file and handed it to Claude Code with three files
 
 The objective is to increase the score until it plateaus or we run out of budget or ideas.
 
-The first ~10 scored experiments went well — the early 20 log entries were mostly crashes; the first scored run was entry #32. Claude Code would read the log, pick the next hypothesis, edit the pipeline code or job config, submit it through `/run` (another Anyscale Claude skill), watch metrics roll in via `/inspect`, score, append. A senior engineer might have gotten here in maybe 3 experiments instead of 10. But each one would have taken much longer.
+The first ~10 experiments went well — by experiment 7 the loop had already found its first kept improvement (a wc200 + m5.large fix that dropped wall time from ~32 minutes to ~23). Claude Code would read the log, pick the next hypothesis, edit the pipeline code or job config, submit it through `/run` (another Anyscale Claude skill), watch metrics roll in via `/inspect`, score, append. A senior engineer might have gotten here in maybe 3 experiments instead of 10. But each one would have taken much longer.
 
 Anyscale's [NFS shared storage](https://docs.anyscale.com/storage/shared) meant everything persisted across sessions — logs, metrics, job artifacts. A fresh Claude Code instance could read `experiment.log` and be caught up in 30 seconds. I started seeing wins: fixing a concurrency parameter that was being silently ignored, tuning the shuffle strategy, adjusting partition counts. Standard optimization work, but the loop freed me from sitting there watching runs finish.
 
-Around scored experiment #10 (log entry ~50), the loop started stuttering. The agent submitted a config it had already tried — same shuffle strategy, same partition count, different variable name. Then a slight variation of something it had rejected at scored experiment 4. Then it circled back to scored experiment 7's approach with different names. Three cycles going nowhere. The `experiment.log` tracked all the outcomes but not the reasoning. The agent knew _what happened_. It didn't know _what to try next_ or _why something had been ruled out_.
+Around experiment 10, the loop started stuttering — and stayed there. Between experiment 10 and experiment 20, no kept improvements. The agent submitted a config it had already tried — same shuffle strategy, same partition count, different variable name. Then a slight variation of something it had rejected at experiment 4. Then it circled back to experiment 7's approach with different names. Three cycles going nowhere. The `experiment.log` tracked all the outcomes but not the reasoning. The agent knew _what happened_. It didn't know _what to try next_ or _why something had been ruled out_.
 
 I stopped the loop. The log was necessary but not sufficient. What was missing was a place for hypotheses — not just outcomes, but intentions. So I created `ideas.md`: a running list of optimization ideas, whether it came from me or the agent, with status tags. PROPOSED, TESTING, ACCEPTED, REJECTED. When the agent started a new cycle, it would read `ideas.md` first, then `experiment.log`. The ideas file told it where to look. The log told it what had already been found.
 
@@ -50,7 +50,7 @@ Usually you want more GPUs for a faster result. But the metrics API was feeding 
 
 ![Fewer GPUs, faster pipeline, half the cost.](/blog_images/ralph-loop-gpu-poor.webp)
 
-By log entry 75, the gains were flattening. The agent was tweaking CPU counts. ~47 scored experiments in the campaign (entry #83 in the full log), the pipeline ran 10M rows reliably, on half the GPUs, in under three days.
+By experiment 36 — the last kept improvement, GPU right-sizing to 20 L40S — the gains had flattened. The remaining ~10 runs were scale-validation and a handful of crashes. 47 experiments in, the pipeline ran 10M rows reliably, on half the GPUs, in under three days.
 
 ![Composite score over experiments — the autoresearch loop converging.](/blog_images/ralph-loop-autotune-progress.webp)
 
