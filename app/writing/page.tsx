@@ -1,77 +1,38 @@
 import { posts } from '#site/content';
-import { PostItem } from '@/components/post-item';
-// import { ActivityCalendar } from '@/components/activity-calendar';
-import { Tag } from '@/components/tag';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getAllTags, sortPosts, sortTagsByCount } from '@/lib/utils';
-import { Metadata } from 'next';
-import { NotebookPen } from 'lucide-react';
+import { sortPosts } from '@/lib/utils';
+import { WritingHero } from '@/components/writing/writing-hero';
+import { WritingSidebar } from '@/components/writing/sidebar';
+import { EditorialRow } from '@/components/writing/editorial-row';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'My writing',
+  title: 'Writing',
   description:
-    'Experiments, TILs, Notes about AI, Data Infrastructure, Startups ...'
+    'Experiments, TILs, retros, and sketchnotes on AI infra, data engineering, and the unglamorous bits of making AI reliable in production.',
 };
 
-export default async function BlogPage() {
-  // Static export: all posts on a single page (no searchParams pagination,
-  // which is incompatible with `output: 'export'`).
-  const displayPosts = sortPosts(posts.filter((post) => post.published));
-
-  const tags = getAllTags(posts);
-  const sortedTags = sortTagsByCount(tags);
+export default function WritingPage() {
+  const all = sortPosts(posts.filter((p) => p.published)).map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    date: p.date,
+    tags: p.tags,
+    image: p.image,
+    body: p.body,
+  }));
 
   return (
-    <div className="container max-w-4xl py-6 lg:py-10">
-      <div className="flex flex-col items-start gap-4 md:flex-row md:justify-between md:gap-8">
-        <div className="flex-1 space-y-4">
-          <h2 className="inline-block font-black text-3xl lg:text-4xl">
-            <NotebookPen className="inline-block size-6 lg:size-10 mr-2" />
-            Writing
-          </h2>
-          <p className="text-xl text-muted-foreground">
-            Experiments, TILs, Notes about AI, Data Infrastructure, Startups ...
-          </p>
+    <main className="mx-auto max-w-content px-4 pb-16 pt-12 sm:px-8">
+      <WritingHero count={all.length} />
+      <div className="mt-10 grid gap-14 lg:grid-cols-[1fr_260px]">
+        <div>
+          {all.map((p, i) => (
+            <EditorialRow key={p.slug} post={p} index={i} accent={i === 0} />
+          ))}
         </div>
+        <WritingSidebar posts={all} />
       </div>
-      {/* <ActivityCalendar posts={all_posts} /> */}
-      <hr className="my-4" />
-      <div className="grid grid-cols-12 gap-3 mt-8">
-        <div className="col-span-12 col-start-1 sm:col-span-8">
-          <hr />
-          {displayPosts?.length > 0 ? (
-            <ul className="flex flex-col">
-              {displayPosts.map((post) => {
-                const { slug, date, title, description, tags, body } = post;
-                return (
-                  <li key={slug}>
-                    <PostItem
-                      slug={slug}
-                      date={date}
-                      title={title}
-                      description={description}
-                      tags={tags}
-                      content={body}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p>Nothing to see here yet</p>
-          )}
-        </div>
-        <Card className="col-span-12 row-start-3 h-fit sm:col-span-4 sm:col-start-9 sm:row-start-1">
-          <CardHeader>
-            <CardTitle>Tags</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {sortedTags?.map((tag) => (
-              <Tag tag={tag} key={tag} count={tags[tag]} />
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    </main>
   );
 }

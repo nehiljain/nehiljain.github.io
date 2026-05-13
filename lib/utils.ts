@@ -85,3 +85,11 @@ export function getReadingTime(text: string | undefined) {
   const stats = readingTime(text);
   return `${Math.ceil(stats.minutes)} min read`;
 }
+
+export function inferKind(tags?: string[]): 'essay' | 'sketchnote' | 'retro' | 'til' {
+  if (!tags) return 'essay';
+  if (tags.includes('sketchnote')) return 'sketchnote';
+  if (tags.includes('til')) return 'til';
+  if (tags.includes('retro') || tags.includes('incident')) return 'retro';
+  return 'essay';
+}
