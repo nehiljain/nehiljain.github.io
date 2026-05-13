@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Bagel_Fat_One, Geist, JetBrains_Mono, Caveat } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
@@ -7,7 +7,11 @@ import { SiteHeader } from '@/components/site-header';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/config/metadata';
 
-const inter = Inter({ subsets: ['latin'] });
+const fontSans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const fontHeading = Geist({ subsets: ['latin'], variable: '--font-heading', weight: ['600', '700'], display: 'swap' });
+const fontDisplay = Bagel_Fat_One({ subsets: ['latin'], weight: '400', variable: '--font-display', display: 'swap' });
+const fontMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
+const fontScript = Caveat({ subsets: ['latin'], variable: '--font-script', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -95,10 +99,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={cn(inter.className, 'min-h-screen bg-background')}>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          fontSans.variable,
+          fontHeading.variable,
+          fontDisplay.variable,
+          fontMono.variable,
+          fontScript.variable
+        )}
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
