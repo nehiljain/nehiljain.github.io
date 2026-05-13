@@ -87,9 +87,9 @@ export const metadata: Metadata = {
   },
   manifest: '/static/favicons/site.webmanifest',
   other: {
-    'msapplication-TileColor': '#da532c',
+    'msapplication-TileColor': '#fe640b',
     'msapplication-config': '/static/favicons/browserconfig.xml',
-    'theme-color': '#ffffff'
+    'theme-color': '#24273a'
   }
 };
 
