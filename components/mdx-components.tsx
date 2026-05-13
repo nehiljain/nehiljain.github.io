@@ -5,6 +5,7 @@ import * as runtime from 'react/jsx-runtime';
 import { Callout } from './callout';
 import { YouTube } from '@/components/youtube';
 import { Tweet } from 'react-tweet';
+import { SketchnotePlate } from '@/components/brand/sketchnote-plate';
 
 const useMDXComponent = (code: string) => {
   const fn = new Function(code);
@@ -15,6 +16,7 @@ const components = {
   Image,
   Callout,
   YouTube,
+  SketchnotePlate,
   Tweet: (props: any) => (
     <div className="flex justify-center my-4 tweet-wrapper">
       <Tweet {...props} />
