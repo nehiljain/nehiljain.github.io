@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { Bagel_Fat_One, JetBrains_Mono, Caveat } from 'next/font/google';
-import localFont from 'next/font/local';
+import { Bagel_Fat_One, Caveat } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
@@ -9,27 +10,10 @@ import { SiteFooter } from '@/components/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/config/metadata';
 
-const fontSans = localFont({
-  src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2',
-  variable: '--font-sans',
-  display: 'swap',
-  weight: '100 900'
-});
-const fontHeading = localFont({
-  src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2',
-  variable: '--font-heading',
-  display: 'swap',
-  weight: '600 700'
-});
 const fontDisplay = Bagel_Fat_One({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-display',
-  display: 'swap'
-});
-const fontMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
   display: 'swap'
 });
 const fontScript = Caveat({
@@ -127,12 +111,18 @@ export default function RootLayout({
       <body
         className={cn(
           'min-h-screen bg-background font-sans antialiased',
-          fontSans.variable,
-          fontHeading.variable,
+          GeistSans.variable,
+          GeistMono.variable,
           fontDisplay.variable,
-          fontMono.variable,
           fontScript.variable
         )}
+        style={
+          {
+            '--font-sans': 'var(--font-geist-sans)',
+            '--font-heading': 'var(--font-geist-sans)',
+            '--font-mono': 'var(--font-geist-mono)'
+          } as React.CSSProperties
+        }
       >
         <ThemeProvider
           attribute="class"
