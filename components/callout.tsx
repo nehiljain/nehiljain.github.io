@@ -1,28 +1,19 @@
+import { Icon } from '@/components/brand/icon';
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
 
-interface CalloutProps {
-  children?: ReactNode;
-  type?: 'default' | 'warning' | 'danger';
-}
+type Props = { title?: string; children: React.ReactNode; className?: string };
 
-export function Callout({
-  children,
-  type = 'default',
-  ...props
-}: CalloutProps) {
+export function Callout({ title, children, className }: Props) {
   return (
-    <div
-      className={cn(
-        'my-6 items-start rounded-md border boder-l-4 p-4 w-full dark:max-w-none',
-        {
-          'border-red-900 bg-red-50 dark:prose': type === 'danger',
-          'border-yellow-900 bg-yellow-50 dark:prose': type === 'warning'
-        }
-      )}
-      {...props}
-    >
-      <div>{children}</div>
-    </div>
+    <aside className={cn(
+      'my-7 flex items-start gap-3 rounded-r-xl border-l-4 border-accent bg-accent-soft px-4 py-3',
+      className
+    )}>
+      <Icon.Spark size={20} stroke="hsl(var(--foreground))" fill="hsl(var(--accent))" />
+      <div>
+        {title && <div className="font-semibold text-foreground">{title}</div>}
+        <div className="mt-0.5 leading-relaxed text-foreground">{children}</div>
+      </div>
+    </aside>
   );
 }
