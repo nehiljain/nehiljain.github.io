@@ -24,7 +24,7 @@ export default function WritingPage() {
 
   return (
     <main className="mx-auto max-w-content px-4 pb-16 pt-12 sm:px-8">
-      <WritingHero count={all.length} />
+      <WritingHero />
       <div className="mt-10 grid gap-14 lg:grid-cols-[1fr_260px]">
         <div>
           {all.map((p, i) => (
