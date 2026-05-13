@@ -14,9 +14,7 @@ export function HomeHero() {
         </div>
         <h1 className="m-0 font-heading text-6xl font-semibold leading-[1.02] tracking-tight text-foreground lg:text-[80px]">
           Hello, I&rsquo;m{' '}
-          <span className="font-display text-accent leading-[0.9] tracking-tighter">
-            Nehil
-          </span>
+          <span className="font-script text-accent">Nehil</span>
           .
         </h1>
         <p className="mt-4 max-w-[560px] text-xl leading-snug text-muted-foreground lg:text-[22px]">
