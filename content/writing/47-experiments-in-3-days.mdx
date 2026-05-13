@@ -16,7 +16,7 @@ Two weeks later, a customer showed up in office hours with a stuck embedding pip
 
 They were processing 4M rows fine but needed to hit 20M and it kept OOMing.
 
-The autoresearch tweet was still in my head. I could see five stages, dozens of knobs, a clear target to hit — so I decided to run my own version of the loop.
+The autoresearch tweet was still in my head. I could see five stages, dozens of knobs, a clear target to hit, so I decided to run my own version of the loop.
 
 Before the agent touched anything, I ran the pipeline once myself. You can't automate a loop you haven't walked through yourself. The pipeline was a typical batch embeddings job. Then I ran `/optimize`, an Anyscale Claude skill, which generated an `optimization_recs.md` against the pipeline. Usual suspects to improve: partition tuning, shuffle strategy, batch sizing.
 
@@ -56,6 +56,6 @@ By experiment 36, the gains were flattening. The agent had found its last kept i
 
 One moment blew my mind. I came back from a customer meeting, 1.5 hrs into the loop. Eight experiments had run while I was gone. One of the levers, shuffle strategy with the right compute config, had been pushed all the way to its plateau. I hadn't watched a single run. I hadn't read a log in real time. The loop had searched a whole dimension while I was on a Zoom call.
 
-That was the shift. Optimization wasn't something I "did" anymore. The work that actually took thinking was upfront, in `scoring.py` and `objective.md`. Verification-driven optimization, basically. TDD for infra. If I get the scoring function wrong and the agent will optimize against the wrong thing which is big risk for $$$.
+That was the shift. Optimization wasn't something I "did" anymore. The work that actually took thinking was upfront, in `scoring.py` and `objective.md`. Verification-driven optimization, basically. TDD for infra. Get the scoring function wrong and the agent will optimize against the wrong thing. At GPU prices, that gets expensive fast.
 
 I believe we’re witnessing a evolution in platform engineering. Our focus has shifted away from hand-crafted optimizations to writing agentic loops with the right primitives to achieve the objective. The agents run the loops. Knowing how to prune the search space well is still a very useful skill.
