@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { ProfilePortrait } from '@/components/brand/profile-portrait';
-import { DoodleArrow } from '@/components/brand/doodle-arrow';
 import { SolidBtn, OutlineBtn } from '@/components/brand/buttons';
 import { Icon } from '@/components/brand/icon';
 import { DATA } from '@/data/resume';
@@ -35,23 +34,7 @@ export function HomeHero() {
         </div>
       </div>
       <div className="relative grid place-items-center">
-        <ProfilePortrait
-          size={300}
-          src={DATA.avatarUrl}
-          label="SF · 2026"
-          sub="ai infra"
-        />
-        <DoodleArrow
-          color="hsl(var(--accent))"
-          width={90}
-          height={50}
-          style={{
-            position: 'absolute',
-            top: -10,
-            right: -10,
-            transform: 'rotate(15deg)'
-          }}
-        />
+        <ProfilePortrait size={300} src={DATA.avatarUrl} />
       </div>
     </section>
   );
