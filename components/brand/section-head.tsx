@@ -1,6 +1,11 @@
 import Link from 'next/link';
 
-type Props = { kicker: string; title: string; linkText?: string; linkHref?: string };
+type Props = {
+  kicker: string;
+  title: string;
+  linkText?: string;
+  linkHref?: string;
+};
 export function SectionHead({ kicker, title, linkText, linkHref }: Props) {
   return (
     <div className="flex items-end justify-between gap-6 border-b border-dashed border-rule/60 pb-2.5">

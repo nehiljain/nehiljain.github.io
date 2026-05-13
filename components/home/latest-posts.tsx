@@ -7,7 +7,12 @@ export function HomeLatestPosts() {
   const latest = sortPosts(posts.filter((p) => p.published)).slice(0, 5);
   return (
     <section className="mb-16">
-      <SectionHead kicker="02 · WRITING" title="Latest" linkText="View all →" linkHref="/writing" />
+      <SectionHead
+        kicker="02 · WRITING"
+        title="Latest"
+        linkText="View all →"
+        linkHref="/writing"
+      />
       <div className="mt-5 flex flex-col">
         {latest.map((p, i) => (
           <EditorialRow
@@ -19,7 +24,7 @@ export function HomeLatestPosts() {
               date: p.date,
               tags: p.tags,
               image: p.image,
-              body: p.body,
+              body: p.body
             }}
             index={i}
             accent={i === 0}

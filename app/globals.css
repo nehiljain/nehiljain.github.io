@@ -5,9 +5,9 @@
 @layer base {
   :root {
     /* Catppuccin Latte (light) — paper-shifted */
-    --background: 39 18% 90%;          /* #ece9e2 */
-    --foreground: 234 16% 35%;          /* #4c4f69 */
-    --card: 40 33% 94%;                 /* #f4f1ea */
+    --background: 39 18% 90%; /* #ece9e2 */
+    --foreground: 234 16% 35%; /* #4c4f69 */
+    --card: 40 33% 94%; /* #f4f1ea */
     --card-foreground: 234 16% 35%;
     --popover: 40 33% 94%;
     --popover-foreground: 234 16% 35%;
@@ -17,7 +17,7 @@
     --secondary-foreground: 234 16% 35%;
     --muted: 39 12% 84%;
     --muted-foreground: 233 10% 47%;
-    --accent: 22 99% 52%;               /* peach #fe640b */
+    --accent: 22 99% 52%; /* peach #fe640b */
     --accent-foreground: 39 18% 90%;
     --accent-soft: 22 99% 52% / 0.18;
     --destructive: 347 87% 44%;
@@ -26,14 +26,14 @@
     --input: 39 12% 82%;
     --ring: 22 99% 52%;
     --rule: 220 14% 71%;
-    --paper: 40 38% 95%;                /* #f7f4ec */
+    --paper: 40 38% 95%; /* #f7f4ec */
     --paper-ink: 234 16% 28%;
     --radius: 0.625rem;
   }
   .dark {
     /* Catppuccin Macchiato */
-    --background: 232 23% 18%;          /* #24273a */
-    --foreground: 227 70% 87%;          /* #cad3f5 */
+    --background: 232 23% 18%; /* #24273a */
+    --foreground: 227 70% 87%; /* #cad3f5 */
     --card: 231 20% 15%;
     --card-foreground: 227 70% 87%;
     --popover: 231 20% 15%;
@@ -44,7 +44,7 @@
     --secondary-foreground: 227 70% 87%;
     --muted: 230 17% 26%;
     --muted-foreground: 228 24% 72%;
-    --accent: 22 84% 73%;               /* peach #f5a97f */
+    --accent: 22 84% 73%; /* peach #f5a97f */
     --accent-foreground: 232 23% 18%;
     --accent-soft: 22 84% 73% / 0.28;
     --destructive: 351 74% 73%;

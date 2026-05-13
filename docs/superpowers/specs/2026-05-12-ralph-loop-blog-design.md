@@ -27,10 +27,10 @@ published: true
 
 Two source images, both PNG, both oversized for web delivery.
 
-| Source | Dims | Size | Target filename | Target dims | Format | Target size |
-|---|---|---|---|---|---|---|
-| `~/Downloads/gpu_poor_blog_image.png` | 2700×1472 | 2.9 MB | `ralph-loop-gpu-poor.webp` | longest edge 1600 px | WebP q82 | ~80 KB |
-| `obsidian-vault/00-Inbox/notion-optimization-kb/docs/experiments/autotune_progress.png` | 5298×2598 | 516 KB | `ralph-loop-autotune-progress.webp` | longest edge 1600 px | WebP q82 | ~150 KB |
+| Source                                                                                  | Dims      | Size   | Target filename                     | Target dims          | Format   | Target size |
+| --------------------------------------------------------------------------------------- | --------- | ------ | ----------------------------------- | -------------------- | -------- | ----------- |
+| `~/Downloads/gpu_poor_blog_image.png`                                                   | 2700×1472 | 2.9 MB | `ralph-loop-gpu-poor.webp`          | longest edge 1600 px | WebP q82 | ~80 KB      |
+| `obsidian-vault/00-Inbox/notion-optimization-kb/docs/experiments/autotune_progress.png` | 5298×2598 | 516 KB | `ralph-loop-autotune-progress.webp` | longest edge 1600 px | WebP q82 | ~150 KB     |
 
 **Optimization step:** one-shot via `sharp-cli` (`npx sharp-cli`) or `cwebp`. WebP-only — universal browser support since ~2020, no `<picture>` fallback needed in MDX.
 
@@ -40,8 +40,8 @@ Two source images, both PNG, both oversized for web delivery.
 
 ## Image Placement in Post
 
-- `ralph-loop-gpu-poor.webp` — replaces the `>>> insert gpu_poor_blog_image png from downloads <<<` placeholder, right after the "50 L40S … utilization sat at 1.2% … 14.9 minutes" paragraph. Alt text: *"Fewer GPUs, faster pipeline, half the cost."*
-- `ralph-loop-autotune-progress.webp` — new placement near the "By experiment 75, the gains were flattening" paragraph, as a visual of the search converging. Alt text: *"Composite score over experiments — the autoresearch loop converging."*
+- `ralph-loop-gpu-poor.webp` — replaces the `>>> insert gpu_poor_blog_image png from downloads <<<` placeholder, right after the "50 L40S … utilization sat at 1.2% … 14.9 minutes" paragraph. Alt text: _"Fewer GPUs, faster pipeline, half the cost."_
+- `ralph-loop-autotune-progress.webp` — new placement near the "By experiment 75, the gains were flattening" paragraph, as a visual of the search converging. Alt text: _"Composite score over experiments — the autoresearch loop converging."_
 
 ## Body Edits (source → post)
 

@@ -1,6 +1,14 @@
 import { SectionHead } from '@/components/brand/section-head';
 
-function NowCard({ kicker, title, body }: { kicker: string; title: string; body: string }) {
+function NowCard({
+  kicker,
+  title,
+  body
+}: {
+  kicker: string;
+  title: string;
+  body: string;
+}) {
   return (
     <div className="relative rounded-xl border border-border bg-card p-5">
       <div className="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-accent">

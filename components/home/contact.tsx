@@ -17,13 +17,19 @@ export function HomeContact() {
           Always down to geek out about distributed systems.
         </h2>
         <p className="mt-3 text-[17px] leading-relaxed text-muted-foreground">
-          Collaborations, hard infra questions, hackathon team-ups, or just a friendly hello.
+          Collaborations, hard infra questions, hackathon team-ups, or just a
+          friendly hello.
         </p>
         <div className="mt-5 flex gap-3">
           <Link href={`mailto:${DATA.email}`} className="no-underline">
             <SolidBtn>{DATA.email}</SolidBtn>
           </Link>
-          <Link href={DATA.contact.social.LinkedIn.url} target="_blank" rel="noopener noreferrer" className="no-underline">
+          <Link
+            href={DATA.contact.social.LinkedIn.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="no-underline"
+          >
             <OutlineBtn>Book a call</OutlineBtn>
           </Link>
         </div>

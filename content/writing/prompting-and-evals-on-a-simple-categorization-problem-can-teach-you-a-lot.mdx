@@ -1,5 +1,5 @@
 ---
-title: "How To Create An AI Budget Assistant Using LLMs In Just 60 Days"
+title: 'How To Create An AI Budget Assistant Using LLMs In Just 60 Days'
 description: "Here's why everyone is talking about using LLMs for personal finance—start your AI budgeting journey today!"
 date: 2024-06-01
 tags: ['genai']
@@ -13,11 +13,12 @@ Here's my journey of building an LLM app to classify and analyze my budget. It's
 As a data and machine learning engineer, automation has always been my north star. Over the past few years, I've automated data flows, model training, and deployment, aiming for efficiency and making them less error-prone. Recently, I embarked on a 60-day plan to master LLMs.
 
 This is my experience tackling a seemingly simple NLP task using LLM tooling and best practices.
+
 ## Some Background: Manual Categorization Woes
 
 For personal budgeting, I use YNAB [^1]. While it's a great tool, manually categorizing transactions can be tedious and error-prone. This inefficiency often leads to procrastination, and let's face it, no one wants to spend their time manually clicking through transactions.
 
-My motivation? Curiosity and the itch to automate what I can. 
+My motivation? Curiosity and the itch to automate what I can.
 
 I wanted to explore how basic language models fare on classification tasks for transaction categorization. Intuitively, it seems like a straightforward task for large LMs, so why not dive in and find out?
 
@@ -45,6 +46,7 @@ Adopt an iterative approach. Start with basic prompts and refine them based on r
 ### 3. Build Evals!
 
 Evals are key to working with non-deterministic models in a larger software system. It's very hard to improve systematically without having proper evaluations set up for your task.
+
 ## Let's us look at some results first
 
 ### `gpt-3.5-turbo` was very slightly better than `gpt-4o` 😲
@@ -61,11 +63,13 @@ One of the reasons why gpts perform better is OpenAI is really good with functio
 
 ![CleanShot 2024-06-10 at 15.04.41.png](/blog_images/CleanShot%202024-06-10%20at%2015.04.41.png)
 The two step chain had the most amount of tokens and the best performance. Extrapolating this result, if I can put more examples in the prompt and I don't care about latency and cost but prefer accuracy then I will get better results.
+
 ### Don't assume a bigger model is always slower!
 
 ![CleanShot 2024-06-10 at 15.06.16.png](/blog_images/CleanShot%202024-06-10%20at%2015.06.16.png)
 Mixtral 8x7B which is the smallest model of all was the slowest of all too. I used Groq for inference and we are looking at avg latency across all experiments.
-##  Implementation details:
+
+## Implementation details:
 
 ![recipe.png](/blog_images/recipe.png)
 Your AI Product Needs Evals [^3]
@@ -88,7 +92,7 @@ I downloaded all the transactions from my bank accounts. Then, I enriched this d
 
 For the last three months, I had around 229 unique transactions.
 
-So please “Look at your data”! 
+So please “Look at your data”!
 
 Mine looks like this:
 ![prompt4.png](/blog_images/prompt4.png)
@@ -100,6 +104,7 @@ Starting simple is key.
 I used the Instructor Python library to implement a basic classification with LLaMA3 8B and OpenAI. I started by simply copying one of the examples from the cookbook and diving in. The guiding principle to focus on here for me was accidental complexity. I wanted to stay close to the LLM API calls but still get reliable outputs in a predefined schema.
 
 A great starting point is with Instructor and OpenAI [^4]:
+
 ```python
 from typing import List
 import enum
@@ -150,7 +155,7 @@ def classify_transaction(description: str) -> BudgetItem:
         ],
         response_model=BudgetItem,
     )
-    
+
 # Step 5: Do a call with example transaction
 example_description = "Dinner at a restaurant"
 classified_item = classify_transaction(example_description)
@@ -178,21 +183,29 @@ I logged over ~7700 traces to conclude the experiment. There are a lot of great 
 
 I experimented with different prompts to improve classification performance.
 It was crucial to compare various models. I tested Mixtral 8x7b, LLaMA3 70b, LLaMA3 8b, gpt-3.5-turbo, and gpt-4o.
-### Basic One-Shot prompt 
+
+### Basic One-Shot prompt
+
 Categorize the transaction based on the description and Google search of the description with function calling.
 
 ![prompt1.png](/blog_images/prompt1.png)
-### Dynamic few-shot prompt 
+
+### Dynamic few-shot prompt
+
 I tried both 3 and 5 examples to categorize the transaction based on the description and Google search of the description with function calling.
 
 ![prompt2.png](/blog_images/prompt2.png)
-### Static Few-shot with CoT 
+
+### Static Few-shot with CoT
+
 I hand crafted chain of thought with examples. How would I look at transaction description and google search results and categorize a transaction.
 
 ![prompt3.png](/blog_images/prompt3.png)
 
 ### Two-step Chain
+
 I wanted to separate Chain of Thought from function calling so I broke it into two steps. One feeding the second. These are the two steps.
+
 1. Static Few-shot (3 examples) with CoT (Same as above)
 2. Parse category with function calling
 
@@ -214,13 +227,15 @@ Prompt engineering is an art that combines creativity, clear communication skill
 
 ## Personal Insights: Navigating the Challenges of LLMs
 
-Working with LLMs has been a mix of excitement and overwhelm. The sheer number of tools and technologies can be daunting. 
+Working with LLMs has been a mix of excitement and overwhelm. The sheer number of tools and technologies can be daunting.
 
 I actively avoided:
+
 1. Tool Overload: With so many platforms and frameworks, it’s easy to feel lost. Prioritizing the basics and taking it one step at a time helped me stay focused.
 2. FOMO created by social media: There are so many flashy demos of AI doing magic. It is very tempting to look at the code and learn from it. Reminding myself that solid ML fundamentals are key helped me keep on track to finish this project.
 
 I actively focused on:
+
 1. **Controlled Experiments**: Helped me understand model behavior.
 2. **Versioning**: Kept track of models, data, and prompts to ensure reliability.
 3. **Data Quality**: Good data is crucial for LLM success.
@@ -232,9 +247,12 @@ Hamel’s course [^5] helped a lot in having a guided path in navigating the LLM
 
 If you read till, I appreciate you for spending time with me out of your busy day :). What are your current problems in using LLMs? I would love to hear from you. [Please reach out!](https://linkedin.com/in/nehiljain)
 
-
 [^1]: YNAB (You Need a Budget) is a personal budgeting software that helps users gain control over their finances by promoting proactive planning and mindful spending. It employs a unique methodology focused on assigning every dollar a job, tracking expenses, and adjusting budgets in real-time to achieve financial goals.
-[^2]: Insightful essay on how libraries inject/morph your prompts before sending it to LLMS  [https://hamel.dev/blog/posts/prompt/](https://hamel.dev/blog/posts/prompt/)
-[^3]: Hamel talks about how to tactically approach Evals. https://hamel.dev/blog/posts/evals/ 
+
+[^2]: Insightful essay on how libraries inject/morph your prompts before sending it to LLMS [https://hamel.dev/blog/posts/prompt/](https://hamel.dev/blog/posts/prompt/)
+
+[^3]: Hamel talks about how to tactically approach Evals. https://hamel.dev/blog/posts/evals/
+
 [^4]: A lot of great examples at [Instructor Docs](https://python.useinstructor.com/examples/classification/#defining-the-structures_1) to get started with structured outputs from LLMs
+
 [^5]: Amazing course setup by Hamel and Dan. LLM-conf + finetuning workshops at https://maven.com/parlance-labs/fine-tuning

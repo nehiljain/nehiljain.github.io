@@ -1,10 +1,22 @@
 import { Icon } from '@/components/brand/icon';
 
-type IconComponent = (props: { size?: number; stroke?: string; fill?: string }) => JSX.Element;
+type IconComponent = (props: {
+  size?: number;
+  stroke?: string;
+  fill?: string;
+}) => JSX.Element;
 
 type Post = { title: string; body: string; slug: string };
 
-function RailStat({ label, value, I }: { label: string; value: string; I: IconComponent }) {
+function RailStat({
+  label,
+  value,
+  I
+}: {
+  label: string;
+  value: string;
+  I: IconComponent;
+}) {
   return (
     <div>
       <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.13em] text-muted-foreground">
@@ -43,7 +55,11 @@ export function PostMetaRail({ post }: { post: Post }) {
   return (
     <aside className="sticky top-20 flex flex-col gap-[18px] self-start">
       <RailStat label="Reading" value={`${minutes} min`} I={Icon.Clock} />
-      <RailStat label="Words" value={wordCount.toLocaleString()} I={Icon.Writing} />
+      <RailStat
+        label="Words"
+        value={wordCount.toLocaleString()}
+        I={Icon.Writing}
+      />
       <div>
         <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.13em] text-muted-foreground">
           Share

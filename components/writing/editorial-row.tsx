@@ -31,7 +31,9 @@ export function EditorialRow({ post, index, accent = false }: Props) {
         {post.tags && post.tags.length > 0 && (
           <div className="mb-1.5 flex flex-wrap items-center gap-2.5">
             {post.tags.map((t, i) => (
-              <TagPill key={t} accent={accent && i === 0}>{t}</TagPill>
+              <TagPill key={t} accent={accent && i === 0}>
+                {t}
+              </TagPill>
             ))}
           </div>
         )}

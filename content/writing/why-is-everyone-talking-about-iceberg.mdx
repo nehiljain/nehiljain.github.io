@@ -1,27 +1,25 @@
 ---
-title: "Why is everyone talking about Iceberg?"
-description: ""
+title: 'Why is everyone talking about Iceberg?'
+description: ''
 date: 2025-05-15
 tags: ['writing', 'data infrastructure']
 published: true
 ---
 
-About a year ago, I left my job as a machine learning engineer to start my company. My day to day moved away from data infrastructure to running a business. As I jump back into it, I see a few important transitions have happened. 
+About a year ago, I left my job as a machine learning engineer to start my company. My day to day moved away from data infrastructure to running a business. As I jump back into it, I see a few important transitions have happened.
 
-Everyone I talk to says Iceberg at least once in the conversation. 
+Everyone I talk to says Iceberg at least once in the conversation.
 
 If you are in the same boat trying to understand the hype about Iceberg in the data community or decide what storage you want to use for your data platform, this post is for you. This post is a dive—into **why** Iceberg matters, **how** it stacks up against Delta Lake and Hudi, and **what** a real-world example of analyzing YouTube videos looks like with Iceberg.
 
 ![Change my mind.jgg](/blog_images/iceberg-blog-change-my-mind-meme.jpg)
-
-
 
 Lakehouses are taking center stage for data platforms and open table formats are making it happen. Data lakehouses have been evolving from messy storage of random files in blob storage to a true source of insights and data workloads for teams.
 
 Back in 2015 a "data lake" meant Hive folders on HDFS:
 
 - **On‑prem HDFS + Hive dirs.** Storage and metadata lived on a single cluster and disks were your capacity ceiling.
-- **Zero ACID & brittle schema.** Adding a column meant *drop + recreate*—and pray downstream jobs didn't explode.
+- **Zero ACID & brittle schema.** Adding a column meant _drop + recreate_—and pray downstream jobs didn't explode.
 - **Ops‑heavy partition fixes.** Two engineers were on-call every time marketing asked for yesterday's numbers.
 
 Fast‑forward to 2025:
@@ -32,11 +30,7 @@ Fast‑forward to 2025:
 
 > **My take:** You're not just picking file layouts anymore—you're choosing the single source of truth your whole data stack will trust. The ultimate goal here is to build a data lake that can be queried from all the different compute engines (Spark, Snowflake, Flink, Trino, DuckDB, etc.)
 
-
-
 ## So what is this Iceberg?
-
-
 
 Imagine! What if your S3 data lake behaved like a warehouse—without locking you into one vendor?
 
@@ -46,63 +40,69 @@ Iceberg's architecture is three simple layers:
 
 1. **Data files** – immutable Parquet/ORC on S3.
 2. **Metadata & manifests** – tiny Avro/JSON files listing data-file stats.
-3. **Catalog** – pointer to the *current* snapshot.
+3. **Catalog** – pointer to the _current_ snapshot.
 
 ![Iceberg Architecture](/blog_images/iceberg-architecture.png)
-
-
 
 Together, they unlock features you used to pay a warehouse for.
 
 ### Every write is a snapshot, we get ACID by metadata swaps
 
-New data files *and* a brand-new snapshot are created for every new write. Metadata keeps track of which snapshot to choose. So there is a point-in-time consistent view of the data.
+New data files _and_ a brand-new snapshot are created for every new write. Metadata keeps track of which snapshot to choose. So there is a point-in-time consistent view of the data.
 
 <figure>
-  <img src="/blog_images/timestamp_snapshot_iceberg.gif" alt="Snapshot Write Iceberg" />
+  <img
+    src="/blog_images/timestamp_snapshot_iceberg.gif"
+    alt="Snapshot Write Iceberg"
+  />
   <figcaption>
-    Source: <a href="https://netflixtechblog.com/incremental-processing-using-netflix-maestro-and-apache-iceberg-b8ba072ddeeb" target="_blank" rel="noopener noreferrer">Incremental Processing using Netflix Maestro and Apache Iceberg</a>
+    Source:{' '}
+    <a
+      href="https://netflixtechblog.com/incremental-processing-using-netflix-maestro-and-apache-iceberg-b8ba072ddeeb"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Incremental Processing using Netflix Maestro and Apache Iceberg
+    </a>
   </figcaption>
 </figure>
 
 In the GIF above you can see how different snapshots are created for the writes coming in.
 
-
-
-There are two main ways you can do row-level changes (CRUD): 
+There are two main ways you can do row-level changes (CRUD):
 
 - **Copy-on-Write (COW)**: When you run an UPDATE, DELETE, or MERGE, Iceberg rewrites the affected data files. This means your table always reflects the latest state in-place, and queries don’t need to merge data at read time. It’s simple and great for batch workloads, but can be more I/O intensive for frequent updates.
 - **Merge-on-Read (MOR)**: Here, updates and deletes are written as new “delta” files, and the actual merging happens when you read the data. This is more efficient for high-velocity, streaming, or CDC workloads, since you avoid rewriting big files on every change. The tradeoff: reads have to do a bit more work to stitch together the latest view.
 
-> **My takeaway:** No global locks; writers only fail when they touch the *same* rows. Spark, Flink, and Trino all leverage this commit model out of the box.
+> **My takeaway:** No global locks; writers only fail when they touch the _same_ rows. Spark, Flink, and Trino all leverage this commit model out of the box.
 
 ### **Iceberg will hide your partitions and evolve your schema without data rewrites**
 
-I used to spend weekends manually reorganizing Hive partitions—renaming folders, running `msck repair`, hoping queries wouldn't break. With Iceberg, partitions live in metadata, not directory names. 
+I used to spend weekends manually reorganizing Hive partitions—renaming folders, running `msck repair`, hoping queries wouldn't break. With Iceberg, partitions live in metadata, not directory names.
 
 Here's what that unlocks:
 
 1. **Define once, adapt forever.** You create the table with an initial spec:
-    
-    ```sql
-    CREATE TABLE watch_events (
-      user_id   BIGINT,
-      event_ts  TIMESTAMP,
-      action    STRING
-    )
-    PARTITIONED BY (days(event_ts));
-    
-    ```
-    
-    When your analytics team later asks to segment by `region`, you simply:
-    
-    ```sql
-    ALTER TABLE watch_events ADD PARTITION FIELD region;
-    
-    ```
-    
-    No file rewrites, no directory shuffles—Iceberg's manifest tracks both old and new layouts.
-    
+
+   ```sql
+   CREATE TABLE watch_events (
+     user_id   BIGINT,
+     event_ts  TIMESTAMP,
+     action    STRING
+   )
+   PARTITIONED BY (days(event_ts));
+
+   ```
+
+   When your analytics team later asks to segment by `region`, you simply:
+
+   ```sql
+   ALTER TABLE watch_events ADD PARTITION FIELD region;
+
+   ```
+
+   No file rewrites, no directory shuffles—Iceberg's manifest tracks both old and new layouts.
+
 2. **Real-world change is messy—partitions shift constantly.** Content launches in new countries, user cohorts evolve, data schemas expand. You can now easily add or modify partition fields dozens of times without downtime or backfills. Iceberg handles the mix of old and new partitions transparently.
 3. **Query pruning stays razor-sharp.** Even if your SQL omits `region`, the engine still consults the metadata to skip irrelevant files, just like it would for `event_ts`. That means performance doesn't regress as your partition strategy evolves.
 
@@ -110,7 +110,7 @@ Here's what that unlocks:
 
 ### **Point-in-Time queries made easy with time-travel snapshots**
 
-I used to spend days to figure out simple what-if analyses before. What if we ran our model on the data before we changed the definition of this feature? 
+I used to spend days to figure out simple what-if analyses before. What if we ran our model on the data before we changed the definition of this feature?
 
 Another problem was debugging ETLs. Here is how I can debug and rerun my ETL by replicating the input data for it in 1 line.
 
@@ -122,12 +122,11 @@ FOR    TIMESTAMP AS OF '2025-05-05 00:00:00';
 
 Iceberg does this by using multi-level metadata hierarchy. It has a root metadata file, manifest list, manifest files themselves and finally the data files.
 
-Another useful benefit of this is snapshots + retention policies = built-in audit *and* GDPR compliance (`expire_snapshots` after 90 days).
-
+Another useful benefit of this is snapshots + retention policies = built-in audit _and_ GDPR compliance (`expire_snapshots` after 90 days).
 
 ## Are there any nuances or does Iceberg rule them all?
 
-When I first needed petabyte-scale batch reads and multi-engine support (Spark jobs, Trino queries and ad-hoc DuckDB analytics), Iceberg's **manifest-tree metadata** won me over. 
+When I first needed petabyte-scale batch reads and multi-engine support (Spark jobs, Trino queries and ad-hoc DuckDB analytics), Iceberg's **manifest-tree metadata** won me over.
 
 But, that's not the whole picture, here is how I look at it.
 
@@ -135,17 +134,15 @@ But, that's not the whole picture, here is how I look at it.
 - **All-in on Databricks?** Early in my career, Delta Lake's **transaction log** and built-in **Change Data Feed** on Databricks simplified merges and streaming pulls.
 - **Open, multi-engine needs?** When pipelines spanned Spark, Athena, and DuckDB, only Iceberg was supported without bespoke connectors.
 
-| Workload pattern | Why it matters | Format to use |
-| --- | --- | --- |
-| Petabyte append-only | Consistent snapshots, hidden partitions | Iceberg |
-| Micro-batch CDC & merges | Real-time upserts + change feeds | Hudi / Delta |
-| Databricks-native | Integrated with DBFS & Unity Catalog | Delta Lake |
+| Workload pattern         | Why it matters                          | Format to use |
+| ------------------------ | --------------------------------------- | ------------- |
+| Petabyte append-only     | Consistent snapshots, hidden partitions | Iceberg       |
+| Micro-batch CDC & merges | Real-time upserts + change feeds        | Hudi / Delta  |
+| Databricks-native        | Integrated with DBFS & Unity Catalog    | Delta Lake    |
 
 > **My take:** No single format rules them all—match tool to task. For most streaming analytics, Iceberg's openness and agile partitions win. But for ultra-low-latency CDC or tight Databricks integration, Hudi or Delta still shine.
 
-
 If you made it this far, its only fair I show you an example implementation to ground your theoretical understanding of Iceberg.
-
 
 ## How would you build a YouTube channel analytics system with Iceberg + DuckDB?
 
@@ -157,9 +154,9 @@ We'll pull **daily snapshots** of every video on a channel using the YouTube Dat
 import os, datetime
 from googleapiclient.discovery import build
 
-API_KEY       = os.getenv("YOUTUBE_API_KEY")      
-CHANNEL_ID    = "UC_x5XG1OV2P6uZZ5FSM9Ttw"        
-SNAPSHOT_DATE = datetime.date.today()             
+API_KEY       = os.getenv("YOUTUBE_API_KEY")
+CHANNEL_ID    = "UC_x5XG1OV2P6uZZ5FSM9Ttw"
+SNAPSHOT_DATE = datetime.date.today()
 
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
@@ -250,9 +247,8 @@ We'll use a **SQLite catalog** and local filesystem warehouse:
 # .pyiceberg.yaml in your project root
 catalog:
   local:
-    uri:       sqlite:///iceberg_catalog/catalog.db
+    uri: sqlite:///iceberg_catalog/catalog.db
     warehouse: file://$(pwd)/iceberg_catalog
-
 ```
 
 ```python
@@ -361,23 +357,22 @@ There you have it—now you can ask your LLM to design queries to answer all the
 
 What are the performance numbers to compare the table formats? At scale that is a big factor to adopt something new like Iceberg.
 
-| Workload (1 TB TPC-DS, 8 vCPU) | Iceberg | Delta | Hudi |
-| --- | --- | --- | --- |
-| Pure scans (Q3, Q96) | **1 × baseline** | 1.1 × | 1.2 × |
-| Merge-heavy (Q18) | 1.4 × | **1 × baseline** | 1.1 × |
-| Incremental read | 1 batch / min | Change Feed @ 10 s | **Hudi MOR @ 3 s** |
+| Workload (1 TB TPC-DS, 8 vCPU) | Iceberg          | Delta              | Hudi               |
+| ------------------------------ | ---------------- | ------------------ | ------------------ |
+| Pure scans (Q3, Q96)           | **1 × baseline** | 1.1 ×              | 1.2 ×              |
+| Merge-heavy (Q18)              | 1.4 ×            | **1 × baseline**   | 1.1 ×              |
+| Incremental read               | 1 batch / min    | Change Feed @ 10 s | **Hudi MOR @ 3 s** |
 
 Cost angles:
 
 - Snapshot & manifest files add ~0.5 % storage overhead—cheap.
 - Biggest spend is still **read I/O**; schedule weekly `rewrite_data_files` + `compact` to keep file sizes sweet-spot (256 MB).
-- Resist the urge to bucket by *every* dimension—Iceberg stats already prune aggressively.
+- Resist the urge to bucket by _every_ dimension—Iceberg stats already prune aggressively.
 
 > **My Takeaway**: Iceberg is fastest for large, append-only analytics; Delta/Hudi gain edge once your workload hammers a lot of updates.
 
 Iceberg delivers warehouse-class **reliability**, **schema flexibility**, and **time travel**—without shackling you to a closed ecosystem. It also has the highest levels of support in the data platform ecosystem.
 Iceberg actually just makes the lakehouse promise a reality. Lakehouse architectures will finally be stable enough to trust in production. That's exciting!
-
 
 ## Recommended resources for learning more:
 

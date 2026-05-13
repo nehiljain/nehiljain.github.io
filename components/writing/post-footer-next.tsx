@@ -2,7 +2,13 @@ import Link from 'next/link';
 
 type NavPost = { slug: string; title: string } | undefined;
 
-export function PostFooterNext({ prev, next }: { prev: NavPost; next: NavPost }) {
+export function PostFooterNext({
+  prev,
+  next
+}: {
+  prev: NavPost;
+  next: NavPost;
+}) {
   if (!prev && !next) return null;
   return (
     <section className="mt-16 border-t border-dashed border-rule pt-8">

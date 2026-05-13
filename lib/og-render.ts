@@ -7,10 +7,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import * as React from 'react';
 import { OgCard, type OgCardProps } from './og-card';
 
-const FONT_PATH = path.resolve(
-  process.cwd(),
-  'assets/fonts/Inter-Bold.ttf'
-);
+const FONT_PATH = path.resolve(process.cwd(), 'assets/fonts/Inter-Bold.ttf');
 
 let fontDataCache: Buffer | null = null;
 
@@ -33,9 +30,7 @@ export async function renderOgPng(props: OgCardProps): Promise<Buffer> {
   const svg = await satori(vdom, {
     width: 1200,
     height: 630,
-    fonts: [
-      { name: 'Inter', data: fontData, style: 'normal', weight: 700 }
-    ]
+    fonts: [{ name: 'Inter', data: fontData, style: 'normal', weight: 700 }]
   });
   const png = new Resvg(svg, { background: 'white' }).render().asPng();
   return Buffer.from(png);

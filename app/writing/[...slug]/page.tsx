@@ -94,7 +94,10 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <main className="mx-auto max-w-content px-4 pb-16 pt-8 sm:px-8">
       <nav className="mb-5 flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
-        <Link href="/writing" className="text-muted-foreground no-underline hover:text-foreground">
+        <Link
+          href="/writing"
+          className="text-muted-foreground no-underline hover:text-foreground"
+        >
           writing
         </Link>
         <span>/</span>
@@ -104,9 +107,7 @@ export default async function PostPage({ params }: PostPageProps) {
       <div className="mt-8 grid gap-10 lg:grid-cols-[180px_1fr_200px]">
         <PostMetaRail post={post} />
         <article className="prose prose-zinc dark:prose-invert max-w-[760px]">
-          {post.image && (
-            <SketchnotePlate src={post.image} alt={post.title} />
-          )}
+          {post.image && <SketchnotePlate src={post.image} alt={post.title} />}
           <MDXContent code={post.body} />
         </article>
         <PostTOCRail items={toc} />

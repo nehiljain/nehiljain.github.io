@@ -12,14 +12,22 @@ import { cn } from '@/lib/utils';
 const NAV = [
   { href: '/writing', label: 'Writing', Icon: Icon.Writing },
   { href: '/projects', label: 'Projects', Icon: Icon.Projects },
-  { href: '/cv', label: 'CV', Icon: Icon.CV },
+  { href: '/cv', label: 'CV', Icon: Icon.CV }
 ];
 
 const SOCIAL = [
   { url: DATA.contact.social.GitHub.url, label: 'GitHub', Icon: Icon.Github },
-  { url: DATA.contact.social.LinkedIn.url, label: 'LinkedIn', Icon: Icon.LinkedIn },
-  { url: DATA.contact.social.Twitter.url, label: 'Twitter', Icon: Icon.Twitter },
-  { url: `mailto:${DATA.email}`, label: 'Email', Icon: Icon.Mail },
+  {
+    url: DATA.contact.social.LinkedIn.url,
+    label: 'LinkedIn',
+    Icon: Icon.LinkedIn
+  },
+  {
+    url: DATA.contact.social.Twitter.url,
+    label: 'Twitter',
+    Icon: Icon.Twitter
+  },
+  { url: `mailto:${DATA.email}`, label: 'Email', Icon: Icon.Mail }
 ];
 
 export function SiteHeader() {

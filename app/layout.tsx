@@ -9,11 +9,34 @@ import { SiteFooter } from '@/components/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/config/metadata';
 
-const fontSans = localFont({ src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2', variable: '--font-sans', display: 'swap', weight: '100 900' });
-const fontHeading = localFont({ src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2', variable: '--font-heading', display: 'swap', weight: '600 700' });
-const fontDisplay = Bagel_Fat_One({ subsets: ['latin'], weight: '400', variable: '--font-display', display: 'swap' });
-const fontMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
-const fontScript = Caveat({ subsets: ['latin'], variable: '--font-script', display: 'swap' });
+const fontSans = localFont({
+  src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2',
+  variable: '--font-sans',
+  display: 'swap',
+  weight: '100 900'
+});
+const fontHeading = localFont({
+  src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2',
+  variable: '--font-heading',
+  display: 'swap',
+  weight: '600 700'
+});
+const fontDisplay = Bagel_Fat_One({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-display',
+  display: 'swap'
+});
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap'
+});
+const fontScript = Caveat({
+  subsets: ['latin'],
+  variable: '--font-script',
+  display: 'swap'
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),

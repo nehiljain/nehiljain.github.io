@@ -7,7 +7,7 @@ const socials = [
   { key: 'GitHub', url: DATA.contact.social.GitHub.url, I: Icon.Github },
   { key: 'LinkedIn', url: DATA.contact.social.LinkedIn.url, I: Icon.LinkedIn },
   { key: 'Twitter', url: DATA.contact.social.Twitter.url, I: Icon.Twitter },
-  { key: 'Mail', url: `mailto:${DATA.email}`, I: Icon.Mail },
+  { key: 'Mail', url: `mailto:${DATA.email}`, I: Icon.Mail }
 ];
 
 export function SiteFooter() {
@@ -18,7 +18,9 @@ export function SiteFooter() {
         <div className="flex items-center gap-3.5">
           <NJMark size={28} />
           <div>
-            <div className="text-[13.5px] font-semibold text-foreground">{DATA.name}</div>
+            <div className="text-[13.5px] font-semibold text-foreground">
+              {DATA.name}
+            </div>
             <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
               SF · AI INFRASTRUCTURE · {year}
             </div>

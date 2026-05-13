@@ -19,6 +19,7 @@ Personal site / blog built on **Next.js 14 (App Router) + Velite + MDX + Tailwin
 **Content pipeline (Velite).** MDX posts live in `content/writing/*.mdx` and are compiled by Velite (`velite.config.ts`) into a typed collection imported as `#site/content` (alias resolved through Velite's generated `.velite/` output). Velite is invoked from `next.config.mjs` via a custom `VeliteWebpackPlugin` that runs `build()` in `beforeCompile` — there is no separate Velite CLI step. The plugin guards with a static `started` flag because Next compiles three times (server, edge, client). MDX is processed with `rehype-slug`, `rehype-pretty-code` (github-dark theme), and `rehype-autolink-headings`. Post frontmatter schema: `title`, `description?`, `date` (isodate), `published` (default true), `tags?`. `slugAsParams` is computed by stripping the leading `writing/` segment.
 
 **Routing.**
+
 - `app/writing/page.tsx` — paginated post index (`POSTS_PER_PAGE = 5`), reads `posts` from `#site/content`, filters `published`, sorts via `lib/utils`.
 - `app/writing/[...slug]/page.tsx` — individual post; catch-all matches `slugAsParams`.
 - `app/tags/`, `app/projects/`, `app/cv/` — static pages. CV content is a TypeScript object in `data/resume.ts`.

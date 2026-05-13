@@ -6,7 +6,7 @@ export function NJMark({
   size = 48,
   accent = NJ_PEACH,
   tilt = 0,
-  bg = null,
+  bg = null
 }: {
   size?: number;
   accent?: string;
@@ -21,9 +21,15 @@ export function NJMark({
       width={w}
       height={h}
       viewBox={`0 0 ${w} ${h}`}
-      style={{ display: 'block', overflow: 'visible', transform: `rotate(${tilt}deg)` }}
+      style={{
+        display: 'block',
+        overflow: 'visible',
+        transform: `rotate(${tilt}deg)`
+      }}
     >
-      {bg && <rect x="0" y="0" width={w} height={h} rx={size * 0.16} fill={bg} />}
+      {bg && (
+        <rect x="0" y="0" width={w} height={h} rx={size * 0.16} fill={bg} />
+      )}
       <ellipse
         cx={w * 0.5}
         cy={h * 0.58}
@@ -51,7 +57,7 @@ export function NJWordmark({
   size = 36,
   accent = NJ_PEACH,
   ink = '#4c4f69',
-  uppercase = false,
+  uppercase = false
 }: {
   size?: number;
   accent?: string;
@@ -69,7 +75,7 @@ export function NJWordmark({
         textTransform: uppercase ? 'uppercase' : 'lowercase',
         display: 'inline-flex',
         alignItems: 'baseline',
-        gap: size * 0.18,
+        gap: size * 0.18
       }}
     >
       <span>nehil</span>
@@ -84,7 +90,7 @@ export function NJWordmark({
             height: size * 0.18,
             borderRadius: '50%',
             background: accent,
-            display: 'inline-block',
+            display: 'inline-block'
           }}
         />
       </span>
@@ -96,7 +102,7 @@ export function NJLockup({
   size = 32,
   accent = NJ_PEACH,
   ink = '#4c4f69',
-  showWordmark = true,
+  showWordmark = true
 }: {
   size?: number;
   accent?: string;
@@ -104,7 +110,9 @@ export function NJLockup({
   showWordmark?: boolean;
 }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.42 }}>
+    <span
+      style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.42 }}
+    >
       <NJMark size={size} accent={accent} />
       {showWordmark && (
         <span
@@ -113,7 +121,7 @@ export function NJLockup({
             fontSize: size * 0.78,
             lineHeight: 0.92,
             letterSpacing: -size * 0.012,
-            color: ink,
+            color: ink
           }}
         >
           nehil jain
@@ -128,7 +136,7 @@ export function NJStamp({
   accent = NJ_PEACH,
   ink = '#4c4f69',
   label = null,
-  sub = null,
+  sub = null
 }: {
   size?: number;
   accent?: string;
@@ -140,8 +148,19 @@ export function NJStamp({
   const h = size;
   return (
     <div style={{ position: 'relative', width: w, height: h }}>
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block' }}>
-        <ellipse cx={w * 0.5} cy={h * 0.58} rx={w * 0.46} ry={h * 0.34} fill={accent} />
+      <svg
+        width={w}
+        height={h}
+        viewBox={`0 0 ${w} ${h}`}
+        style={{ display: 'block' }}
+      >
+        <ellipse
+          cx={w * 0.5}
+          cy={h * 0.58}
+          rx={w * 0.46}
+          ry={h * 0.34}
+          fill={accent}
+        />
         <text
           x={w * 0.5}
           y={h * 0.96}
@@ -157,14 +176,20 @@ export function NJStamp({
       {label && (
         <div
           style={{
-            position: 'absolute', top: 12, right: -8,
+            position: 'absolute',
+            top: 12,
+            right: -8,
             transform: 'rotate(6deg)',
-            background: '#fff', color: ink,
-            borderRadius: 999, padding: '6px 12px',
-            fontFamily: 'var(--font-mono), monospace', fontSize: 10,
-            letterSpacing: 1.4, textTransform: 'uppercase',
+            background: '#fff',
+            color: ink,
+            borderRadius: 999,
+            padding: '6px 12px',
+            fontFamily: 'var(--font-mono), monospace',
+            fontSize: 10,
+            letterSpacing: 1.4,
+            textTransform: 'uppercase',
             border: `1.5px dashed ${ink}`,
-            fontWeight: 600,
+            fontWeight: 600
           }}
         >
           {label}
@@ -176,7 +201,7 @@ export function NJStamp({
                 letterSpacing: 0,
                 textTransform: 'none',
                 marginTop: -2,
-                opacity: 0.75,
+                opacity: 0.75
               }}
             >
               {sub}

@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Writing',
   description:
-    'Experiments, TILs, retros, and sketchnotes on AI infra, data engineering, and the unglamorous bits of making AI reliable in production.',
+    'Experiments, TILs, retros, and sketchnotes on AI infra, data engineering, and the unglamorous bits of making AI reliable in production.'
 };
 
 export default function WritingPage() {
@@ -19,7 +19,7 @@ export default function WritingPage() {
     date: p.date,
     tags: p.tags,
     image: p.image,
-    body: p.body,
+    body: p.body
   }));
 
   return (
