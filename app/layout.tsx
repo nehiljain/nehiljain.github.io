@@ -65,38 +65,54 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicons/favicon.svg', type: 'image/svg+xml' },
       {
-        url: '/static/favicons/favicon-32x32.png',
+        url: '/favicons/favicon-32x32.png',
         sizes: '32x32',
         type: 'image/png'
       },
       {
-        url: '/static/favicons/favicon-16x16.png',
+        url: '/favicons/favicon-16x16.png',
         sizes: '16x16',
         type: 'image/png'
       }
     ],
-    shortcut: '/static/favicons/favicon.ico',
+    shortcut: '/favicons/favicon.ico',
     apple: [
       {
-        url: '/static/favicons/apple-touch-icon.png',
+        url: '/favicons/apple-touch-icon.png',
         sizes: '180x180',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-167x167.png',
+        sizes: '167x167',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-152x152.png',
+        sizes: '152x152',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-120x120.png',
+        sizes: '120x120',
         type: 'image/png'
       }
     ],
     other: [
       {
         rel: 'mask-icon',
-        url: '/static/favicons/safari-pinned-tab.svg',
-        color: '#5bbad5'
+        url: '/favicons/safari-pinned-tab.svg',
+        color: '#fe640b'
       }
     ]
   },
-  manifest: '/static/favicons/site.webmanifest',
+  manifest: '/favicons/site.webmanifest',
   other: {
-    'msapplication-TileColor': '#fe640b',
-    'msapplication-config': '/static/favicons/browserconfig.xml',
-    'theme-color': '#24273a'
+    'msapplication-TileColor': '#ece9e2',
+    'msapplication-config': '/favicons/browserconfig.xml',
+    'theme-color': '#fe640b'
   }
 };
 

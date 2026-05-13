@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { NJStamp } from '@/components/brand/nj-mark';
+import { ProfilePortrait } from '@/components/brand/profile-portrait';
 import { DoodleArrow } from '@/components/brand/doodle-arrow';
 import { SolidBtn, OutlineBtn } from '@/components/brand/buttons';
 import { Icon } from '@/components/brand/icon';
@@ -35,7 +35,12 @@ export function HomeHero() {
         </div>
       </div>
       <div className="relative grid place-items-center">
-        <NJStamp size={300} label="SF · 2026" sub="ai infra" />
+        <ProfilePortrait
+          size={300}
+          src={DATA.avatarUrl}
+          label="SF · 2026"
+          sub="ai infra"
+        />
         <DoodleArrow
           color="hsl(var(--accent))"
           width={90}
