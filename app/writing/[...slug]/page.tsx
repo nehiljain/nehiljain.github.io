@@ -10,7 +10,6 @@ import { siteMetadata } from '@/config/metadata';
 import { sortPosts } from '@/lib/utils';
 import { extractToc } from '@/lib/toc';
 import { PostHeader } from '@/components/writing/post-header';
-import { PostMetaRail } from '@/components/writing/post-meta-rail';
 import { PostTOCRail } from '@/components/writing/post-toc-rail';
 import { PostFooterNext } from '@/components/writing/post-footer-next';
 import { SketchnotePlate } from '@/components/brand/sketchnote-plate';
@@ -104,9 +103,8 @@ export default async function PostPage({ params }: PostPageProps) {
         <span className="text-foreground">{post.slugAsParams}</span>
       </nav>
       <PostHeader post={post} />
-      <div className="mt-8 grid gap-10 lg:grid-cols-[180px_1fr_200px]">
-        <PostMetaRail post={post} />
-        <article className="prose prose-zinc dark:prose-invert max-w-[760px]">
+      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1fr)_220px]">
+        <article className="prose prose-zinc dark:prose-invert max-w-none">
           {post.image && <SketchnotePlate src={post.image} alt={post.title} />}
           <MDXContent code={post.body} />
         </article>
