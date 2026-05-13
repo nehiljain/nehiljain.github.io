@@ -6,25 +6,8 @@ type Props = {
 };
 
 export function ProfilePortrait({ size = 280, src, label, sub }: Props) {
-  const blobW = size * 1.05;
-  const blobH = size * 0.78;
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg
-        width={blobW}
-        height={blobH}
-        viewBox={`0 0 ${blobW} ${blobH}`}
-        className="absolute block"
-        style={{ left: -blobW * 0.05, top: size * 0.18 }}
-      >
-        <ellipse
-          cx={blobW * 0.5}
-          cy={blobH * 0.5}
-          rx={blobW * 0.48}
-          ry={blobH * 0.46}
-          fill="hsl(var(--accent))"
-        />
-      </svg>
       <div
         role="img"
         aria-label="Nehil Jain"
