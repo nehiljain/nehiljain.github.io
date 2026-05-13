@@ -7,7 +7,7 @@ import { DATA } from '@/data/resume';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { NJMark } from '@/components/brand/nj-mark';
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -23,13 +23,7 @@ export function MobileNav() {
         <div className="flex flex-col h-full">
           <div className="flex-1">
             <Link href="/" className="flex items-center space-x-2">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={24}
-                height={24}
-                className="h-6 w-6 rounded-full"
-              />
+              <NJMark size={24} />
               <span className="font-bold">{DATA.name}</span>
             </Link>
             <nav className="mt-4 flex flex-col space-y-3">
