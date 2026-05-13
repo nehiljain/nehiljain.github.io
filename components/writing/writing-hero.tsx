@@ -5,9 +5,7 @@ export function WritingHero() {
         Notes from the field<span className="text-accent">.</span>
       </h1>
       <p className="mt-3.5 max-w-[640px] text-[19px] leading-snug text-muted-foreground">
-        Experiments, TILs, retros, and sketchnotes on AI infra, data
-        engineering, and the unglamorous bits of making AI reliable in
-        production.
+        Experiments, TILs, retros, and sketchnotes.
       </p>
     </section>
   );

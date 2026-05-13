@@ -27,22 +27,17 @@ function NowCard({
 export function HomeNowSection() {
   return (
     <section className="mb-16">
-      <SectionHead kicker="01 · NOW" title="What I'm working on" />
+      <SectionHead title="What I'm working on" />
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         <NowCard
           kicker="ANYSCALE"
-          title="Ray at 10+ F500 accounts"
-          body="Driving Ray adoption with enterprise ML teams. Shipped 3 upstream contributions in 2026."
-        />
-        <NowCard
-          kicker="SKETCHNOTES"
-          title="One-page visual explainers"
-          body="GPU performance, distributed compute, LLM internals — Mike Rohde tradition, Macchiato palette."
+          title="Field engineering"
+          body="I partner with ML and platform teams on the hard parts of scaling distributed AI on Ray… multimodal pipelines, distributed training, and inference engineering."
         />
         <NowCard
           kicker="WRITING"
           title="Notes from the field"
-          body="Production fixes, autoresearch sweeps, the cost of fighting your platform — short, opinionated, useful."
+          body="Experiments, TILs, retros, and sketchnotes."
         />
       </div>
     </section>

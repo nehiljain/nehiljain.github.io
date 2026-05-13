@@ -8,7 +8,6 @@ export function HomeLatestPosts() {
   return (
     <section className="mb-16">
       <SectionHead
-        kicker="02 · WRITING"
         title="Latest"
         linkText="View all →"
         linkHref="/writing"
