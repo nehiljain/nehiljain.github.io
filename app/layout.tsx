@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { Bagel_Fat_One, Geist, JetBrains_Mono, Caveat } from 'next/font/google';
+import { Bagel_Fat_One, JetBrains_Mono, Caveat } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
@@ -7,8 +8,8 @@ import { SiteHeader } from '@/components/site-header';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/config/metadata';
 
-const fontSans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
-const fontHeading = Geist({ subsets: ['latin'], variable: '--font-heading', weight: ['600', '700'], display: 'swap' });
+const fontSans = localFont({ src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2', variable: '--font-sans', display: 'swap', weight: '100 900' });
+const fontHeading = localFont({ src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2', variable: '--font-heading', display: 'swap', weight: '600 700' });
 const fontDisplay = Bagel_Fat_One({ subsets: ['latin'], weight: '400', variable: '--font-display', display: 'swap' });
 const fontMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' });
 const fontScript = Caveat({ subsets: ['latin'], variable: '--font-script', display: 'swap' });
