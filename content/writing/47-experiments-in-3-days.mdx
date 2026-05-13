@@ -36,7 +36,7 @@ The first ~10 experiments went well — by experiment 7 the loop had already fou
 
 Anyscale's [NFS shared storage](https://docs.anyscale.com/storage/shared) meant everything persisted across sessions — logs, metrics, job artifacts. A fresh Claude Code instance could read `experiment.log` and be caught up in 30 seconds. I started seeing wins: fixing a concurrency parameter that was being silently ignored, tuning the shuffle strategy, adjusting partition counts. Standard optimization work, but the loop freed me from sitting there watching runs finish.
 
-Around experiment 10, the loop started stuttering — and stayed there. Between experiment 10 and experiment 20, no kept improvements. The agent submitted a config it had already tried — same shuffle strategy, same partition count, different variable name. Then a slight variation of something it had rejected at experiment 4. Then it circled back to experiment 7's approach with different names. Three cycles going nowhere. The `experiment.log` tracked all the outcomes but not the reasoning. The agent knew _what happened_. It didn't know _what to try next_ or _why something had been ruled out_.
+Around experiment 10, the loop started stuttering. Between experiment 10 and experiment 20, the agent submitted a config it had already tried: same shuffle strategy, same partition count, different variable name. Then a slight variation of something it had rejected at experiment #4. Then it circled back to experiment #7's approach with different names. Three cycles going nowhere. The `experiment.log` tracked all the outcomes but not the reasoning. The agent knew _what happened_. It didn't know _what to try next_ or _why something had been ruled out_.
 
 I stopped the loop. The log was necessary but not sufficient. What was missing was a place for hypotheses — not just outcomes, but intentions. So I created `ideas.md`: a running list of optimization ideas, whether it came from me or the agent, with status tags. PROPOSED, TESTING, ACCEPTED, REJECTED. When the agent started a new cycle, it would read `ideas.md` first, then `experiment.log`. The ideas file told it where to look. The log told it what had already been found.
 
@@ -46,16 +46,16 @@ Then, 12 consecutive CUDA OOMs across two GPU types looked like we needed more m
 
 The same pattern repeated with GPU count. For the first part of the optimization it was focusing on getting the total time down, but then it added ideas around increasing utilization.
 
-Usually you want more GPUs for a faster result. But the metrics API was feeding utilization data into the scoring function, and at 50 L40S GPUs utilization sat at 1.2%. The agent proposed 20. Run came back: 14.9 minutes, down from 15.6. $18 instead of $35. Fewer GPUs, faster pipeline, half the cost. At this point I couldn't believe it.
-
 ![Fewer GPUs, faster pipeline, half the cost.](/blog_images/ralph-loop-gpu-poor.webp)
 
-By experiment 36 — the last kept improvement, GPU right-sizing to 20 L40S — the gains had flattened. The remaining ~10 runs were scale-validation and a handful of crashes. 47 experiments in, the pipeline ran 10M rows reliably, on half the GPUs, in under three days.
+Usually you want more GPUs for a faster result. But the metrics API was feeding utilization data into the scoring function, and at 50 L40S GPUs utilization sat at 1.2%. The agent proposed 20. Run came back: 14.9 minutes, down from 15.6. $18 instead of $35. Fewer GPUs, faster pipeline, half the cost. At this point I couldn't believe it.
 
 ![Composite score over experiments — the autoresearch loop converging.](/blog_images/ralph-loop-autotune-progress.webp)
+
+By experiment 36, the gains were flattening. The agent had found its last kept improvement, GPU right-sizing to 20 L40S. The remaining ~10 runs were scale-validation. 47 experiments in, the pipeline ran 10M rows reliably, on half the GPUs, in under three days.
 
 One moment blew my mind. I came back from a customer meeting, 1.5 hrs into the loop. Eight experiments had run while I was gone. One of the levers — shuffle strategy with the right compute config — had been pushed all the way to its plateau. I hadn't watched a single run. I hadn't read a log in real time. The loop had searched a whole dimension while I was on a Zoom call.
 
 That was the shift. Optimization wasn't something I _did_ anymore — it was something I _set up_ and walked away from. The work that actually took thinking was upfront, in `scoring.py` and `objective.md`. Verification-driven optimization, basically. TDD for infra. Get the scoring function wrong and the agent will optimize against the wrong thing for 47 experiments straight and call it a win.
 
-I think this is where platform engineering is heading. Not writing the optimization. Writing the loop that finds it. The objective file, the experiment log, the scoring function — that's the new deliverable. The agent runs the search. You choose the search space. And choosing the search space well is the whole skill now.
+I believe we’re witnessing a evolution in platform engineering. Our focus has shifted away from hand-crafted optimizations to writing agentic loops with the right primitives to achieve the objective. The agents run the loops. Knowing how to prune the search space well is still a very useful skill.
