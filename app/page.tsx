@@ -1,7 +1,6 @@
 import { HomeHero } from '@/components/home/hero';
 import { HomeNowSection } from '@/components/home/now-section';
 import { HomeLatestPosts } from '@/components/home/latest-posts';
-import { HomeContact } from '@/components/home/contact';
 
 export default function Home() {
   return (
@@ -9,7 +8,6 @@ export default function Home() {
       <HomeHero />
       <HomeNowSection />
       <HomeLatestPosts />
-      <HomeContact />
     </main>
   );
 }
