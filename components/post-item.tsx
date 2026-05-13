@@ -32,7 +32,7 @@ export function PostItem({
           <h2 className="text-xl font-bold tracking-tight">{title}</h2>
 
           {description && (
-            <div className="text-muted-foreground line-clamp-2">
+            <div className="text-muted-foreground line-clamp-3">
               {description}
             </div>
           )}
