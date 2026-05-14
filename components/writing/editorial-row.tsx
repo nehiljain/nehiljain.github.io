@@ -19,7 +19,7 @@ type Props = { post: EditorialPost; index: number; accent?: boolean };
 export function EditorialRow({ post, index, accent = false }: Props) {
   const hasImage = !!post.image;
   const readTime = post.body ? getReadingTime(post.body) : null;
-  const titleSize = accent ? 'text-4xl lg:text-[40px]' : 'text-[28px]';
+  const titleSize = accent ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl';
 
   return (
     <Link
@@ -47,7 +47,7 @@ export function EditorialRow({ post, index, accent = false }: Props) {
             <span className="text-rule">·</span>
           )}
           {post.tags?.map((t, i) => (
-            <TagPill key={t} accent={accent && i === 0}>
+            <TagPill key={t}>
               {t}
             </TagPill>
           ))}

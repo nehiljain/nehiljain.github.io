@@ -9,7 +9,7 @@ export default function ProjectsPage() {
   return (
     <main className="container max-w-4xl mx-auto py-8 space-y-8">
       <section className="space-y-4">
-        <h1 className="text-3xl font-bold">🛠️ Projects & Experiments</h1>
+        <h1 className="text-3xl font-bold">🛠️ Projects</h1>
         <p className="text-muted-foreground">
           Projects I have worked on.
         </p>

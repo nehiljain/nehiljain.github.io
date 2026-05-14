@@ -22,11 +22,11 @@ export function PostHeader({ post }: { post: Post }) {
           {formatDate(post.date)} · {readTime}
         </span>
       </div>
-      <h1 className="m-0 font-heading text-5xl font-semibold leading-[1.06] tracking-tight text-foreground lg:text-[60px]">
+      <h1 className="m-0 font-heading text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl lg:text-4xl">
         {post.title}
       </h1>
       {post.description && (
-        <p className="mt-4 text-xl leading-snug text-muted-foreground lg:text-[21px]">
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground sm:text-lg">
           {post.description}
         </p>
       )}
