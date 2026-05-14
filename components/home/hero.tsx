@@ -12,12 +12,12 @@ export function HomeHero() {
           <span className="inline-block h-[7px] w-[7px] rounded-full bg-[hsl(var(--accent))]" />
           Now: {DATA.org} · {DATA.title}
         </div>
-        <h1 className="m-0 font-heading text-6xl font-semibold leading-[1.02] tracking-tight text-foreground lg:text-[80px]">
+        <h1 className="m-0 font-heading text-5xl font-semibold leading-[1.02] tracking-tight text-foreground lg:text-[64px]">
           Hello, I&rsquo;m{' '}
           <span className="font-script text-accent">Nehil</span>
           .
         </h1>
-        <p className="mt-4 max-w-[560px] text-xl leading-snug text-muted-foreground lg:text-[22px]">
+        <p className="mt-4 max-w-[560px] text-base leading-snug text-muted-foreground">
           {DATA.description}
         </p>
         <div className="mt-7 flex gap-3">
