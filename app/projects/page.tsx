@@ -27,7 +27,7 @@ export default function ProjectsPage() {
                         {project.title}
                       </h2>
                       <p className="text-sm text-muted-foreground">
-                        {project.industry} • {project.role}
+                        {project.tag ?? project.industry} • {project.role}
                       </p>
                     </div>
                     <Badge

@@ -107,10 +107,15 @@ export default function AboutPage() {
                       {job.start} - {job.end}
                     </p>
                   </div>
-                  {job.description && (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {job.description}
-                    </p>
+                  {job.highlights && (
+                    <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                      {job.highlights.map((highlight) => (
+                        <li key={highlight} className="flex gap-2">
+                          <span className="mt-[0.4rem] size-1 shrink-0 rounded-full bg-muted-foreground/60" />
+                          <span>{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </CardContent>
               </Card>
@@ -160,7 +165,9 @@ export default function AboutPage() {
                       <h3 className="font-semibold group-hover:text-primary transition-colors">
                         {project.title}
                       </h3>
-                      <Badge variant="secondary">{project.industry}</Badge>
+                      <Badge variant="secondary">
+                        {project.tag ?? project.industry}
+                      </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {project.description}
