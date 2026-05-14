@@ -102,12 +102,16 @@ export default async function PostPage({ params }: PostPageProps) {
         <span>/</span>
         <span className="text-foreground">{post.slugAsParams}</span>
       </nav>
-      <PostHeader post={post} />
-      <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,1fr)_220px]">
-        <article className="prose prose-zinc dark:prose-invert max-w-none">
-          {post.image && <SketchnotePlate src={post.image} alt={post.title} />}
-          <MDXContent code={post.body} />
-        </article>
+      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_220px]">
+        <div>
+          <PostHeader post={post} />
+          <article className="prose prose-zinc dark:prose-invert mt-10 max-w-none">
+            {post.image && (
+              <SketchnotePlate src={post.image} alt={post.title} />
+            )}
+            <MDXContent code={post.body} />
+          </article>
+        </div>
         <PostTOCRail items={toc} />
       </div>
       <PostFooterNext
