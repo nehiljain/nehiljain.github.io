@@ -6,7 +6,7 @@ export const siteMetadata = {
   siteUrl: 'https://nehiljain.com',
   siteName: DATA.name,
   twitterHandle: '@nehiljain',
-  socialImage: '/static/favicons/og-image.png', // Assuming you have this
+  socialImage: '/favicons/og-image.png',
   locale: 'en-US',
   analytics: {
     googleAnalyticsId: '' // Add if you have GA

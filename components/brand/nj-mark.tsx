@@ -101,7 +101,7 @@ export function NJWordmark({
 export function NJLockup({
   size = 32,
   accent = NJ_PEACH,
-  ink = '#4c4f69',
+  ink = 'hsl(var(--foreground))',
   showWordmark = true
 }: {
   size?: number;
