@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <ellipse cx="32" cy="32" rx="30.5" ry="25.5" fill="#fe640b"></ellipse>
+  <text x="32" y="48" text-anchor="middle" font-family="&#39;Bagel Fat One&#39;, system-ui, sans-serif" font-size="42" font-weight="400" fill="#11111b" letter-spacing="-1">nj</text>
+</svg>

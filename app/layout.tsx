@@ -1,13 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Bagel_Fat_One, Caveat } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { siteMetadata } from '@/config/metadata';
 
-const inter = Inter({ subsets: ['latin'] });
+const fontDisplay = Bagel_Fat_One({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-display',
+  display: 'swap'
+});
+const fontScript = Caveat({
+  subsets: ['latin'],
+  variable: '--font-script',
+  display: 'swap'
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -52,38 +65,54 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicons/favicon.svg', type: 'image/svg+xml' },
       {
-        url: '/static/favicons/favicon-32x32.png',
+        url: '/favicons/favicon-32x32.png',
         sizes: '32x32',
         type: 'image/png'
       },
       {
-        url: '/static/favicons/favicon-16x16.png',
+        url: '/favicons/favicon-16x16.png',
         sizes: '16x16',
         type: 'image/png'
       }
     ],
-    shortcut: '/static/favicons/favicon.ico',
+    shortcut: '/favicons/favicon.ico',
     apple: [
       {
-        url: '/static/favicons/apple-touch-icon.png',
+        url: '/favicons/apple-touch-icon.png',
         sizes: '180x180',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-167x167.png',
+        sizes: '167x167',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-152x152.png',
+        sizes: '152x152',
+        type: 'image/png'
+      },
+      {
+        url: '/favicons/apple-touch-icon-120x120.png',
+        sizes: '120x120',
         type: 'image/png'
       }
     ],
     other: [
       {
         rel: 'mask-icon',
-        url: '/static/favicons/safari-pinned-tab.svg',
-        color: '#5bbad5'
+        url: '/favicons/safari-pinned-tab.svg',
+        color: '#fe640b'
       }
     ]
   },
-  manifest: '/static/favicons/site.webmanifest',
+  manifest: '/favicons/site.webmanifest',
   other: {
-    'msapplication-TileColor': '#da532c',
-    'msapplication-config': '/static/favicons/browserconfig.xml',
-    'theme-color': '#ffffff'
+    'msapplication-TileColor': '#ece9e2',
+    'msapplication-config': '/favicons/browserconfig.xml',
+    'theme-color': '#fe640b'
   }
 };
 
@@ -95,10 +124,25 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={cn(inter.className, 'min-h-screen bg-background')}>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          GeistSans.variable,
+          GeistMono.variable,
+          fontDisplay.variable,
+          fontScript.variable
+        )}
+        style={
+          {
+            '--font-sans': 'var(--font-geist-sans)',
+            '--font-heading': 'var(--font-geist-sans)',
+            '--font-mono': 'var(--font-geist-mono)'
+          } as React.CSSProperties
+        }
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
@@ -106,6 +150,7 @@ export default function RootLayout({
             <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
               <div className="flex-1">{children}</div>
+              <SiteFooter />
             </div>
           </TooltipProvider>
         </ThemeProvider>

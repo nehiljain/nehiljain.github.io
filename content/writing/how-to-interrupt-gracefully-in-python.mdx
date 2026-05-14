@@ -1,11 +1,10 @@
 ---
-title: "How To Interrupt Gracefully In Python Without Losing Your Progress"
+title: 'How To Interrupt Gracefully In Python Without Losing Your Progress'
 description: "Here's why everyone is talking about gracefully interrupting Python processes without losing progress..."
 date: 2024-03-05
 tags: []
 published: true
 ---
-
 
 I had a usecase where I was running a loop with each loop doing complex work. I wanted to run the code but also parallel improve it. The code was time consumingly gathering and processing data.
 
@@ -14,6 +13,7 @@ The improvements were future proofing it.
 I wanted to kill the long running process in the terminal but not loose any information. So I learnt using ChatGPT how to do this in python.
 
 The idea is:
+
 1. Import the `signal` module.
 2. Define a handler function for `SIGINT` that sets a global flag, indicating an interrupt signal was received.
 3. Check this flag at a suitable point in your loop to decide whether to continue or break out of the loop.
@@ -64,6 +64,5 @@ if __name__ == '__main__':
         time.sleep(random.randint(1, 5))
         main()
 ```
-
 
 This is a neat pattern that is useful for my data engineering work in general where things are happening in iterations and I want to interrupt but not loose the work done. Also, partial failures are painful to deal with so thats a nice thing too.

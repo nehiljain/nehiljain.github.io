@@ -23,7 +23,6 @@ const MANIFEST_PATH = path.join(OG_DIR, '.manifest.json');
 const METADATA_PATH = path.join(ROOT, 'config', 'metadata.ts');
 const GITHUB_URL = 'https://github.com/nehiljain';
 
-
 async function readSiteUrl() {
   // config/metadata.ts is TS; we extract the siteUrl literal with a regex
   // rather than transpiling the file. This is robust as long as the field
@@ -100,8 +99,7 @@ export async function generate({
   return { written, skipped, total: posts.length };
 }
 
-const isMain =
-  import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
+const isMain = import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
 if (isMain) {
   const result = await generate();
   console.log(

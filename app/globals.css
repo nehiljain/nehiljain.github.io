@@ -4,65 +4,57 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-
-    --accent: 45.4 93.4% 47.5%;
-    --accent-foreground: 220.9 39.3% 11%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
-
-    --radius: 0.5rem;
+    /* Catppuccin Latte (light) — paper-shifted */
+    --background: 39 18% 90%; /* #ece9e2 */
+    --foreground: 234 16% 35%; /* #4c4f69 */
+    --card: 40 33% 94%; /* #f4f1ea */
+    --card-foreground: 234 16% 35%;
+    --popover: 40 33% 94%;
+    --popover-foreground: 234 16% 35%;
+    --primary: 234 16% 35%;
+    --primary-foreground: 39 18% 90%;
+    --secondary: 39 12% 84%;
+    --secondary-foreground: 234 16% 35%;
+    --muted: 39 12% 84%;
+    --muted-foreground: 233 10% 47%;
+    --accent: 22 99% 52%; /* peach #fe640b */
+    --accent-foreground: 39 18% 90%;
+    --accent-soft: 22 99% 52% / 0.18;
+    --destructive: 347 87% 44%;
+    --destructive-foreground: 39 18% 90%;
+    --border: 39 12% 82%;
+    --input: 39 12% 82%;
+    --ring: 22 99% 52%;
+    --rule: 220 14% 71%;
+    --paper: 40 38% 95%; /* #f7f4ec */
+    --paper-ink: 234 16% 28%;
+    --radius: 0.625rem;
   }
-
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-
-    --accent: 45.4 93.4% 47.5%;
-    --accent-foreground: 26 83.3% 14.1%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
+    /* Catppuccin Macchiato */
+    --background: 232 23% 18%; /* #24273a */
+    --foreground: 227 70% 87%; /* #cad3f5 */
+    --card: 231 20% 15%;
+    --card-foreground: 227 70% 87%;
+    --popover: 231 20% 15%;
+    --popover-foreground: 227 70% 87%;
+    --primary: 227 70% 87%;
+    --primary-foreground: 232 23% 18%;
+    --secondary: 230 17% 26%;
+    --secondary-foreground: 227 70% 87%;
+    --muted: 230 17% 26%;
+    --muted-foreground: 228 24% 72%;
+    --accent: 22 84% 73%; /* peach #f5a97f */
+    --accent-foreground: 232 23% 18%;
+    --accent-soft: 22 84% 73% / 0.28;
+    --destructive: 351 74% 73%;
+    --destructive-foreground: 232 23% 18%;
+    --border: 230 17% 26%;
+    --input: 230 17% 26%;
+    --ring: 22 84% 73%;
+    --rule: 230 13% 37%;
+    --paper: 40 25% 89%;
+    --paper-ink: 232 15% 28%;
   }
 }
 

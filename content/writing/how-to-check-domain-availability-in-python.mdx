@@ -1,13 +1,13 @@
 ---
-title: "How To Check Domain Availability In Python: A Complete Guide"
-description: "Discover the correct way to check if your desired domain is available with Python—avoid common pitfalls!"
+title: 'How To Check Domain Availability In Python: A Complete Guide'
+description: 'Discover the correct way to check if your desired domain is available with Python—avoid common pitfalls!'
 date: 2024-02-06
 tags: ['python']
 published: true
 ---
 
-
 The right way:
+
 ```python
 import whoisdomain as whois
 def check_domain_availability(domain):
@@ -20,9 +20,11 @@ def check_domain_availability(domain):
 ```
 
 ## Learning:
+
 DNS lookup to check domain availability, may not always be accurate. This method can't detect domains that are registered but not assigned to a DNS server.
 
 Wrong way:
+
 ```python
 import socket
 def check_domain(domain):

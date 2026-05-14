@@ -15,6 +15,7 @@
 ## File Structure
 
 **New files:**
+
 - `lib/og-card.tsx` — extracted JSX of the OG card. Pure function `OgCard({ title, footerUrl }): ReactNode`. Used by both the build-time script and (optionally) any future preview tooling. **Single responsibility:** "what an OG card looks like."
 - `lib/og-render.ts` — wraps satori + resvg. Pure function `renderOgPng({ title, footerUrl, fontData }): Promise<Buffer>`. **Single responsibility:** "turn props into PNG bytes." Kept separate from the card so we can unit-test rendering without re-running the script.
 - `scripts/generate-og-images.mjs` — orchestration: read velite output, hash titles/slugs, render PNGs that need rendering, write manifest. **Single responsibility:** batch driver.
@@ -28,6 +29,7 @@
 - `tests/fixtures/velite-writing.json` — minimal velite output for unit tests (2 posts).
 
 **Modified files:**
+
 - `next.config.mjs` — add `output: 'export'`, `images.unoptimized: true`.
 - `app/writing/[...slug]/page.tsx` — replace `/api/og?title=…` with `${absoluteSiteUrl}/og/${post.slugAsParams}.png` in `openGraph.images` and `twitter.images`.
 - `package.json` — `build` becomes `velite && node scripts/generate-og-images.mjs && next build`. Add `test`, `test:e2e:local`, `test:e2e:prod`. Add `satori`, `satori-html`, `@resvg/resvg-js`, `vitest`, `@playwright/test`, `serve` to devDependencies.
@@ -35,6 +37,7 @@
 - `lib/og-render.ts` reads `config/metadata.ts` (not `config/site.ts`).
 
 **Deleted files:**
+
 - `app/api/og/route.tsx` — static export refuses to build with API routes; the route's logic moves into `lib/og-card.tsx` + `lib/og-render.ts`.
 
 ---
@@ -42,6 +45,7 @@
 ## Task 1: Set up the implementation branch
 
 **Files:**
+
 - None (branch ops only)
 
 - [ ] **Step 1: Switch to spec branch**
@@ -80,6 +84,7 @@ Expected: `200`.
 ## Task 2: Add devDependencies for OG generation and testing
 
 **Files:**
+
 - Modify: `package.json` (devDependencies + scripts)
 
 - [ ] **Step 1: Install OG generation libs**
@@ -137,6 +142,7 @@ git commit -m "chore: add satori, vitest, playwright dev deps for cloudflare mig
 ## Task 3: Add vitest config
 
 **Files:**
+
 - Create: `vitest.config.ts`
 
 - [ ] **Step 1: Write `vitest.config.ts`**
@@ -181,6 +187,7 @@ git commit -m "chore: add vitest config"
 ## Task 4: Extract OG card JSX into `lib/og-card.tsx`
 
 **Files:**
+
 - Create: `lib/og-card.tsx`
 
 The card rendering today lives inline in `app/api/og/route.tsx`. We extract it into a pure component. The component returns the same JSX tree, parameterized on `title` and `footerUrl`. The `tw="..."` Tailwind shorthand is preserved — `satori-html` understands it.
@@ -243,6 +250,7 @@ git commit -m "feat(og): extract OG card JSX into reusable component"
 ## Task 5: Write `lib/og-render.ts` (satori + resvg wrapper)
 
 **Files:**
+
 - Create: `lib/og-render.ts`
 
 This module imports `OgCard`, runs `satori` to get SVG, then `resvg` to produce PNG bytes. Reads font once and caches it on first call.
@@ -259,10 +267,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import * as React from 'react';
 import { OgCard, type OgCardProps } from './og-card';
 
-const FONT_PATH = path.resolve(
-  process.cwd(),
-  'assets/fonts/Inter-Bold.ttf'
-);
+const FONT_PATH = path.resolve(process.cwd(), 'assets/fonts/Inter-Bold.ttf');
 
 let fontDataCache: Buffer | null = null;
 
@@ -282,9 +287,7 @@ export async function renderOgPng(props: OgCardProps): Promise<Buffer> {
   const svg = await satori(vdom, {
     width: 1200,
     height: 630,
-    fonts: [
-      { name: 'Inter', data: fontData, style: 'normal', weight: 700 }
-    ]
+    fonts: [{ name: 'Inter', data: fontData, style: 'normal', weight: 700 }]
   });
   const png = new Resvg(svg, { background: 'white' }).render().asPng();
   return Buffer.from(png);
@@ -303,6 +306,7 @@ git commit -m "feat(og): satori + resvg PNG rendering wrapper"
 ## Task 6: Write fixture velite output for tests
 
 **Files:**
+
 - Create: `tests/fixtures/velite-writing.json`
 
 - [ ] **Step 1: Write fixture**
@@ -342,6 +346,7 @@ git commit -m "test: add velite output fixture"
 ## Task 7: Vitest test for `og-render.ts`
 
 **Files:**
+
 - Create: `tests/og-render.test.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -446,6 +451,7 @@ git commit -m "test: og-render produces valid 1200x630 PNG"
 ## Task 8: Vitest test for `og-card` (smoke)
 
 **Files:**
+
 - Create: `tests/og-card.test.ts`
 
 - [ ] **Step 1: Write the test**
@@ -505,6 +511,7 @@ git commit -m "test: og-card markup smoke test"
 ## Task 9: Write `scripts/generate-og-images.mjs`
 
 **Files:**
+
 - Create: `scripts/generate-og-images.mjs`
 
 The script reads `.velite/writing.json`, hashes each post's `(title, slugAsParams)`, compares against `public/og/.manifest.json`, renders only new/changed posts, writes PNGs, then writes the updated manifest.
@@ -598,8 +605,7 @@ export async function generate({
   return { written, skipped, total: posts.length };
 }
 
-const isMain =
-  import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
+const isMain = import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
 if (isMain) {
   const result = await generate();
   console.log(
@@ -674,6 +680,7 @@ git commit -m "feat(og): build-time PNG generator with hash manifest"
 ## Task 10: Vitest test for `generate-og-images.mjs`
 
 **Files:**
+
 - Create: `tests/generate-og-images.test.ts`
 
 This test exercises the cache, the manifest format, and most importantly verifies the **footer URL comes from `config/metadata.ts`** (not `config/site.ts`) — the bug we're fixing.
@@ -807,6 +814,7 @@ git commit -m "test: og generation script + cache + metadata.ts URL bug fix"
 ## Task 11: Update `next.config.mjs` for static export
 
 **Files:**
+
 - Modify: `next.config.mjs`
 
 - [ ] **Step 1: Edit the config**
@@ -866,6 +874,7 @@ git commit -m "feat(build): enable Next.js static export"
 ## Task 12: Delete `app/api/og/route.tsx`
 
 **Files:**
+
 - Delete: `app/api/og/route.tsx`
 
 - [ ] **Step 1: Remove the file**
@@ -896,6 +905,7 @@ git commit -m "feat(build): remove dynamic OG route (replaced by build-time gene
 ## Task 13: Update `app/writing/[...slug]/page.tsx` to use static OG URLs
 
 **Files:**
+
 - Modify: `app/writing/[...slug]/page.tsx` (lines around 28-65 in `generateMetadata`)
 
 The OG image URL must be absolute. Use `process.env.CF_PAGES_URL` (set by Cloudflare on every build) with a fallback to `siteConfig.siteUrl` from `config/metadata.ts`.
@@ -948,8 +958,7 @@ return {
 With:
 
 ```ts
-const baseUrl =
-  process.env.CF_PAGES_URL ?? siteMetadata.siteUrl;
+const baseUrl = process.env.CF_PAGES_URL ?? siteMetadata.siteUrl;
 const ogUrl = `${baseUrl}/og/${post.slugAsParams}.png`;
 
 return {
@@ -999,6 +1008,7 @@ git commit -m "feat(og): point post metadata at static /og/<slug>.png URLs"
 ## Task 14: Update `.gitignore`
 
 **Files:**
+
 - Modify: `.gitignore`
 
 - [ ] **Step 1: Append to `.gitignore`**
@@ -1028,6 +1038,7 @@ git commit -m "chore: gitignore generated OG images"
 ## Task 15: Full local build verification
 
 **Files:**
+
 - None (verification only)
 
 - [ ] **Step 1: Clean previous build artifacts**
@@ -1043,6 +1054,7 @@ pnpm build 2>&1 | tee /tmp/cf-build.log
 ```
 
 Expected: log shows
+
 1. velite step (`build finished in ...ms`)
 2. og generation step (`[og] wrote 54, skipped 0, total 54`)
 3. next build with `Exporting (54/54)` or similar at the end
@@ -1097,6 +1109,7 @@ git status
 ## Task 16: Add Playwright config
 
 **Files:**
+
 - Create: `playwright.config.ts`
 - Create: `e2e/.gitkeep`
 
@@ -1105,8 +1118,7 @@ git status
 ```ts
 import { defineConfig, devices } from '@playwright/test';
 
-const PROD_URL =
-  process.env.E2E_BASE_URL ?? 'https://nehiljain-com.pages.dev';
+const PROD_URL = process.env.E2E_BASE_URL ?? 'https://nehiljain-com.pages.dev';
 
 export default defineConfig({
   testDir: './e2e',
@@ -1161,6 +1173,7 @@ git commit -m "chore: playwright config (local + prod projects)"
 ## Task 17: Write `e2e/site-loads.spec.ts`
 
 **Files:**
+
 - Create: `e2e/site-loads.spec.ts`
 
 - [ ] **Step 1: Write the spec**
@@ -1215,6 +1228,7 @@ git commit -m "test(e2e): route smoke tests"
 ## Task 18: Write `e2e/og-image.spec.ts`
 
 **Files:**
+
 - Create: `e2e/og-image.spec.ts`
 
 - [ ] **Step 1: Write the spec**
@@ -1225,7 +1239,10 @@ import { test, expect } from '@playwright/test';
 test('an OG image is served as 1200x630 PNG', async ({ page, request }) => {
   // Find a post link from /writing
   await page.goto('/writing');
-  const href = await page.locator('a[href^="/writing/"]').first().getAttribute('href');
+  const href = await page
+    .locator('a[href^="/writing/"]')
+    .first()
+    .getAttribute('href');
   expect(href).toBeTruthy();
   const slug = href!.replace(/^\/writing\//, '').replace(/\/$/, '');
   const ogPath = `/og/${slug}.png`;
@@ -1242,9 +1259,14 @@ test('an OG image is served as 1200x630 PNG', async ({ page, request }) => {
 
 test('post page references its OG image', async ({ page }) => {
   await page.goto('/writing');
-  const href = await page.locator('a[href^="/writing/"]').first().getAttribute('href');
+  const href = await page
+    .locator('a[href^="/writing/"]')
+    .first()
+    .getAttribute('href');
   await page.goto(href!);
-  const ogContent = await page.locator('meta[property="og:image"]').getAttribute('content');
+  const ogContent = await page
+    .locator('meta[property="og:image"]')
+    .getAttribute('content');
   expect(ogContent).toMatch(/\/og\/.+\.png$/);
 });
 ```
@@ -1269,6 +1291,7 @@ git commit -m "test(e2e): OG image content-type, dimensions, meta reference"
 ## Task 19: Create the Cloudflare Pages project via wrangler
 
 **Files:**
+
 - None (CLI op only)
 
 - [ ] **Step 1: Confirm wrangler auth**
@@ -1302,6 +1325,7 @@ Expected: one row. No commit (no repo changes).
 ## Task 20: First deploy via direct upload
 
 **Files:**
+
 - None (CLI op only; relies on `out/` from Task 15)
 
 - [ ] **Step 1: Make sure `out/` is fresh**
@@ -1335,6 +1359,7 @@ Expected: `200` for the homepage, and the OG image returns `200` with `content-t
 ## Task 21: Run E2E tests against the live deployment
 
 **Files:**
+
 - None
 
 - [ ] **Step 1: Run prod E2E**
@@ -1348,6 +1373,7 @@ Expected: all 7 tests pass against `https://nehiljain-com.pages.dev`.
 - [ ] **Step 2: If any test fails**
 
 Triage:
+
 - 404 on a route → check Pages "Build output directory" really matches `out/`. Re-deploy.
 - OG image fails dimensions → check `public/og/` was included in `out/`; Next.js `output: 'export'` should copy it automatically. If missing, list `out/og/` to confirm.
 - Console errors → likely a missing asset because of `unoptimized: true`; re-check `next.config.mjs`.
@@ -1359,6 +1385,7 @@ Fix, redeploy with `wrangler pages deploy out --project-name nehiljain-com --bra
 ## Task 22: GitHub auto-deploy hookup (manual)
 
 **Files:**
+
 - None (dashboard step done by user)
 
 - [ ] **Step 1: Print the hand-off instructions**
@@ -1401,6 +1428,7 @@ Expected: all 7 tests pass.
 ## Task 23: Open the PR
 
 **Files:**
+
 - None (PR is the existing #11)
 
 - [ ] **Step 1: Push the branch**
@@ -1478,6 +1506,7 @@ dig www.nehiljain.com CNAME +short
 3. Save. Propagation: typically <1 hour, max 48 hours.
 
 Verify:
+
 ```bash
 dig nehiljain.com NS +short
 # Should return Cloudflare's nameservers, not GoDaddy's
@@ -1492,6 +1521,7 @@ In Cloudflare dashboard, the site flips from **Pending** to **Active** once it s
 3. Repeat for `www.nehiljain.com`. Optionally configure a www→apex (or apex→www) redirect via Cloudflare Rules → Redirect Rules.
 
 Verify:
+
 ```bash
 curl -sI https://nehiljain.com | head -5
 # Expect HTTP/2 200, server: cloudflare

@@ -9,12 +9,14 @@
 **Tech Stack:** Next.js 14, Velite, MDX, pnpm, ImageMagick (`magick`), `cwebp` (libwebp), git/gh.
 
 **Reference implementation:** Branch `blog/ralph-loop-autoresearch`, commit `ecfa811`. Files added:
+
 - `content/writing/the-platform-is-the-harness.mdx`
 - `public/blog_images/ralph-loop-gpu-poor.webp`
 - `public/blog_images/ralph-loop-autotune-progress.webp`
 - `docs/superpowers/specs/2026-05-12-ralph-loop-blog-design.md`
 
 **Template parameters (substitute per post):**
+
 - `<POST-SLUG>` — kebab-case URL slug, e.g. `the-platform-is-the-harness`
 - `<POST-TITLE>` — quoted string, ≤99 chars (Velite schema limit)
 - `<POST-DESCRIPTION>` — ≤999 chars, shows in feed/OG (optional but recommended)
@@ -27,25 +29,27 @@
 
 ## File Structure
 
-| File | Responsibility |
-|---|---|
-| `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` | Source-of-truth design for this post (frontmatter, asset list, placement, edits) |
-| `content/writing/<POST-SLUG>.mdx` | The post itself: Velite-schema'd frontmatter + MDX body |
-| `public/blog_images/<IMG-PREFIX>-<descriptor>.webp` | Pre-optimized WebP assets (one per image), referenced as `/blog_images/<filename>` |
-| `docs/superpowers/plans/YYYY-MM-DD-<topic>-plan.md` | (Optional) Per-post execution log if non-trivial |
+| File                                                  | Responsibility                                                                     |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` | Source-of-truth design for this post (frontmatter, asset list, placement, edits)   |
+| `content/writing/<POST-SLUG>.mdx`                     | The post itself: Velite-schema'd frontmatter + MDX body                            |
+| `public/blog_images/<IMG-PREFIX>-<descriptor>.webp`   | Pre-optimized WebP assets (one per image), referenced as `/blog_images/<filename>` |
+| `docs/superpowers/plans/YYYY-MM-DD-<topic>-plan.md`   | (Optional) Per-post execution log if non-trivial                                   |
 
 **Conventions:**
+
 - One MDX file per post. No sub-routing inside `writing/`.
 - Image filenames are post-scoped (`<IMG-PREFIX>-` prefix) to avoid collisions in the flat `public/blog_images/` directory.
 - WebP only — universal browser support since 2020; no `<picture>` fallback needed.
 - Longest edge 1600 px (covers 2× retina at the site's prose column width).
-- Spec must exist before plan execution; spec captures *what*, plan captures *how*.
+- Spec must exist before plan execution; spec captures _what_, plan captures _how_.
 
 ---
 
 ## Task 1: Branch off latest master
 
 **Files:**
+
 - No files modified yet; sets up the working branch.
 
 - [ ] **Step 1: Verify working tree is clean and on a sensible base**
@@ -56,11 +60,13 @@ Expected: working tree clean (or only untracked files you intend to bring along)
 - [ ] **Step 2: Fetch and check out latest master**
 
 Run:
+
 ```bash
 git fetch origin master
 git checkout master
 git pull --ff-only
 ```
+
 Expected: "Already up to date." or fast-forward.
 
 - [ ] **Step 3: Create the feature branch**
@@ -78,6 +84,7 @@ Expected: `Done in <Ns> using pnpm vX.Y.Z`. Required because `master` may have m
 ## Task 2: Author the design spec
 
 **Files:**
+
 - Create: `docs/superpowers/specs/YYYY-MM-DD-<POST-SLUG>-design.md`
 
 - [ ] **Step 1: Write the spec**
@@ -92,33 +99,42 @@ Spec must contain (use 2026-05-12-ralph-loop-blog-design.md as concrete referenc
 **Branch:** `blog/<POST-SLUG>` off `master`
 
 ## Goal
+
 [1-2 sentences: what's the post, where does the source content live]
 
 ## Frontmatter
-\`\`\`yaml
----
+
+## \`\`\`yaml
+
 title: '<POST-TITLE>'
 description: '<POST-DESCRIPTION>'
 date: <POST-DATE>
 tags: <TAGS>
 published: true
+
 ---
+
 \`\`\`
+
 - File path: `content/writing/<POST-SLUG>.mdx`
 - URL: `/writing/<POST-SLUG>`
 
 ## Assets
-| Source path | Source dims | Source size | Target filename | Target dims | Target size |
-|---|---|---|---|---|---|
-| <abs path> | WxH | NMB | <IMG-PREFIX>-<desc>.webp | longest 1600px | <est> |
+
+| Source path | Source dims | Source size | Target filename          | Target dims    | Target size |
+| ----------- | ----------- | ----------- | ------------------------ | -------------- | ----------- |
+| <abs path>  | WxH         | NMB         | <IMG-PREFIX>-<desc>.webp | longest 1600px | <est>       |
 
 ## Image Placement
+
 For each image: where in the post it goes (anchor by paragraph), and the alt text.
 
 ## Body Edits
+
 Bullet list of edits from source → published form: typo fixes, todo resolutions, image inserts. No structural rewrites without explicit call-out.
 
 ## Out of Scope
+
 - Adding next/image or build-time pipeline
 - Editing other posts
 - Backporting optimization to existing images
@@ -127,6 +143,7 @@ Bullet list of edits from source → published form: typo fixes, todo resolution
 - [ ] **Step 2: Commit the spec**
 
 Run:
+
 ```bash
 git add docs/superpowers/specs/YYYY-MM-DD-<POST-SLUG>-design.md
 git commit -m "docs(specs): design for <POST-SLUG> post"
@@ -137,12 +154,14 @@ git commit -m "docs(specs): design for <POST-SLUG> post"
 ## Task 3: Optimize and place images
 
 **Files:**
+
 - Create (one per image): `public/blog_images/<IMG-PREFIX>-<descriptor>.webp`
 
 - [ ] **Step 1: Verify image tools are installed**
 
 Run: `which magick cwebp`
 Expected: both resolve under `/opt/homebrew/bin/`. If missing:
+
 ```bash
 brew install imagemagick webp
 ```
@@ -165,6 +184,7 @@ cwebp -q 82 -mt "$TMP/img2.png" -o "$OUT/<IMG-PREFIX>-<descriptor2>.webp"
 ```
 
 Notes:
+
 - The `>` in `1600x1600>` is critical — it means "only shrink, never enlarge."
 - Quality 82 is the visual-vs-size sweet spot for screenshots and diagrams. For photos with gradients you can push to 85; for posterized UI screenshots 75 is fine.
 - `-mt` enables multi-threaded encode.
@@ -172,10 +192,12 @@ Notes:
 - [ ] **Step 3: Verify output dimensions and sizes**
 
 Run:
+
 ```bash
 ls -lh ~/code/nehiljain.com/public/blog_images/<IMG-PREFIX>-*.webp
 identify ~/code/nehiljain.com/public/blog_images/<IMG-PREFIX>-*.webp
 ```
+
 Expected: every file ≤ 200 KB (most should be 30–100 KB), every file ≤ 1600 px on the long edge. If any file is larger, drop quality to 75 and re-encode, or check that the source isn't a photo that needs different settings.
 
 - [ ] **Step 4: Spot-check one image visually**
@@ -188,11 +210,13 @@ Expected: image looks correct — no posterization on gradients, no banding on c
 ## Task 4: Author the MDX post
 
 **Files:**
+
 - Create: `content/writing/<POST-SLUG>.mdx`
 
 - [ ] **Step 1: Write the post file with Velite-conformant frontmatter**
 
 The Velite schema (`velite.config.ts:13-31`) requires:
+
 - `title` (string, max 99 chars) — REQUIRED
 - `date` (ISO date `YYYY-MM-DD`) — REQUIRED
 - `description` (string, max 999 chars) — optional but recommended
@@ -224,8 +248,9 @@ published: true
 ```
 
 Image reference rules:
+
 - Path is always `/blog_images/<file>.webp` (absolute, served from `public/`).
-- Alt text describes the *meaning* (e.g. "Composite score over experiments — the autoresearch loop converging") not the appearance ("a chart with blue dots"). Required for screen readers and OG previews.
+- Alt text describes the _meaning_ (e.g. "Composite score over experiments — the autoresearch loop converging") not the appearance ("a chart with blue dots"). Required for screen readers and OG previews.
 - Do NOT use a relative path. Do NOT use Markdown imports — Velite's asset rewriter is configured for MDX import syntax only, and we are deliberately not using it.
 
 - [ ] **Step 2: Verify frontmatter parses by running Velite**
@@ -238,6 +263,7 @@ Expected: `[VELITE] build finished in <N>ms` with no schema errors. If you see a
 ## Task 5: Verify locally
 
 **Files:**
+
 - No files modified.
 
 - [ ] **Step 1: Start dev server and load the post**
@@ -249,10 +275,13 @@ Expected: post renders with title, date, tags, body, and BOTH images visible. Ve
 - [ ] **Step 2: Stop dev server, run full build**
 
 Stop `pnpm dev`. Then:
+
 ```bash
 pnpm build 2>&1 | tail -10
 ```
+
 Expected:
+
 - `[VELITE] build finished in <N>ms`
 - `✓ Generating static pages (N/N)` — N should have incremented by 1 vs. baseline
 - The new route appears in the `/writing/[...slug]` list
@@ -269,27 +298,32 @@ Expected: no errors. Warnings are OK but worth glancing at.
 ## Task 6: Commit and open PR
 
 **Files:**
+
 - No new files; commits the work from Tasks 2–4.
 
 - [ ] **Step 1: Stage everything**
 
 Run:
+
 ```bash
 git add content/writing/<POST-SLUG>.mdx \
         public/blog_images/<IMG-PREFIX>-*.webp \
         docs/superpowers/specs/YYYY-MM-DD-<POST-SLUG>-design.md
 git status -sb
 ```
+
 Expected: A entries for the MDX, WebPs, and spec. No accidental staging of `node_modules/`, `.velite/`, `public/og/`, or `.next/`.
 
 - [ ] **Step 2: Commit**
 
 Run:
+
 ```bash
 git commit -m "feat(writing): add <POST-SLUG> post
 
 [1-2 sentence summary of the post's subject and any notable assets.]"
 ```
+
 Expected: single commit on the feature branch.
 
 - [ ] **Step 3: Push branch**
@@ -300,6 +334,7 @@ Expected: branch pushed, GitHub prints a PR-create URL.
 - [ ] **Step 4: Open PR via gh**
 
 Run:
+
 ```bash
 gh pr create --base master --title "Add post: <POST-TITLE>" --body "$(cat <<'EOF'
 ## Summary
@@ -316,6 +351,7 @@ gh pr create --base master --title "Add post: <POST-TITLE>" --body "$(cat <<'EOF
 EOF
 )"
 ```
+
 Expected: PR URL printed. Merging the PR ships the post.
 
 ---

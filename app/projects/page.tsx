@@ -11,8 +11,7 @@ export default function ProjectsPage() {
       <section className="space-y-4">
         <h1 className="text-3xl font-bold">🛠️ Projects & Experiments</h1>
         <p className="text-muted-foreground">
-          A collection of AI tools and experiments I&apos;ve built - from
-          hackathon wins to weekend hacks.
+          Projects I have worked on.
         </p>
       </section>
 
