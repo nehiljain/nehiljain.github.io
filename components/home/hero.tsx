@@ -32,7 +32,7 @@ export function HomeHero() {
         </div>
       </div>
       <div className="relative grid place-items-center">
-        <ProfilePortrait size={300} src={DATA.avatarUrl} />
+        <ProfilePortrait size={240} src={DATA.avatarUrl} />
       </div>
     </section>
   );

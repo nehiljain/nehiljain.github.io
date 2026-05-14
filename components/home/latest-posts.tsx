@@ -25,7 +25,6 @@ export function HomeLatestPosts() {
               image: p.image,
               body: p.body
             }}
-            index={i}
             accent={i === 0}
           />
         ))}

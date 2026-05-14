@@ -14,26 +14,22 @@ export type EditorialPost = {
   body?: string;
 };
 
-type Props = { post: EditorialPost; index: number; accent?: boolean };
+type Props = { post: EditorialPost; accent?: boolean };
 
-export function EditorialRow({ post, index, accent = false }: Props) {
+export function EditorialRow({ post, accent = false }: Props) {
   const hasImage = !!post.image;
   const readTime = post.body ? getReadingTime(post.body) : null;
-  const titleSize = accent ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl';
+  const titleSize = 'text-xl sm:text-2xl';
 
   return (
     <Link
       href={'/' + post.slug}
       className={`group grid items-start gap-6 border-t border-rule/40 py-6 no-underline text-foreground ${
         hasImage
-          ? 'grid-cols-[52px_minmax(0,1fr)_200px]'
-          : 'grid-cols-[52px_minmax(0,1fr)]'
+          ? 'grid-cols-[minmax(0,1fr)_200px]'
+          : 'grid-cols-[minmax(0,1fr)]'
       }`}
     >
-      <div className="pt-1 font-mono text-[11px] font-semibold tracking-wide text-muted-foreground transition-colors duration-200 group-hover:text-accent">
-        {String(index + 1).padStart(2, '0')}
-      </div>
-
       <div className="min-w-0">
         <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] text-muted-foreground">
           <span>{formatDate(post.date)}</span>
