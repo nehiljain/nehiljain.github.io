@@ -28,7 +28,7 @@ export default function WritingPage() {
       <div className="mt-10 grid gap-14 lg:grid-cols-[1fr_260px]">
         <div>
           {all.map((p, i) => (
-            <EditorialRow key={p.slug} post={p} index={i} accent={i === 0} />
+            <EditorialRow key={p.slug} post={p} accent={i === 0} />
           ))}
         </div>
         <WritingSidebar posts={all} />
