@@ -1,0 +1,52 @@
+---
+title: 'One L4, six Triton servers: fractional GPU sharing without MIG'
+description: 'Defaulting to one model per GPU strands most of the VRAM. Embedding Triton inside Ray Serve replicas lets six models share an L4 with autoscaling and routing built in.'
+date: 2026-05-19
+tags: ['ray', 'gpu', 'inference', 'mlops', 'anyscale']
+published: true
+image: /blog_images/triton-fractional-gpu-hero.jpg
+---
+
+![Six Triton Inference Servers sharing one L4 GPU via Ray Serve fractional scheduling](/blog_images/triton-fractional-gpu-hero.jpg)
+
+Most ML teams deploy one model per GPU. The L4 has 24 GB of VRAM; a typical embedding model uses 2–4 GB of it. The remaining 20 GB sits idle until the next request arrives. It's the same logic as renting a six-bedroom house and sleeping in one room — but at GPU prices, the waste shows up in your bill every hour.
+
+The alternative: run six Triton Inference Servers on a single L4, with no MIG, no hardware partitioning, and about 300 lines of code to wire up routing and autoscaling.
+
+## Why one-model-per-GPU is the wrong default
+
+The reflex makes sense on the surface. GPU memory is finite, isolation feels safe, and Triton's performance story is compelling enough that teams want to give each model its own clean environment.
+
+But most real serving workloads are bursty and low-QPS — embedding endpoints, internal classifiers, document processing models, rerankers. At any given moment, most of those models are idle. The GPU is allocated; it's just not doing anything.
+
+The cost isn't just wasted VRAM. You're also paying for the instance, managing six separate deployments, and writing custom routing and health-check logic every time you add a model.
+
+## What Triton and Ray Serve each do
+
+They solve different problems at different layers.
+
+Triton optimizes GPU execution. Tensor in, tensor out, as fast as possible. Dynamic batching gets you around 3.7x throughput. TensorRT quantization adds another 5x on top. If your bottleneck is GPU speed and your model pipeline is stable, Triton gives you the shortest path from request to inference.
+
+Ray Serve handles everything above the GPU: routing, autoscaling, pipeline composition, health checks. Python-native. Each step in a pipeline scales independently — CPU replicas for tokenization, GPU replicas for inference. And critically for this use case: fractional GPU scheduling, where you tell Ray how much of a GPU each replica needs rather than allocating a whole device per process.
+
+These aren't competing options. They operate at different layers.
+
+## Stacking them: Triton inside Ray Serve replicas
+
+The mechanism is NVIDIA's in-process Python API. Instead of launching a standalone Triton server process, you instantiate Triton directly inside a Ray Serve deployment class. The `InferenceServerContext` starts up inside the replica's Python process, loads the model repository, and handles batching. Ray Serve owns the replica lifecycle, routes requests to it, and scales it up or down.
+
+The GPU scheduling primitive is `num_gpus` on the Ray deployment decorator. Setting `num_gpus=0.16` tells Ray each replica needs roughly one-sixth of a GPU. Ray packs six replicas onto one physical L4 and handles the bin-packing. No MIG configuration, no CUDA MPS setup — Ray's resource scheduler manages it.
+
+The Triton model configs stay unchanged. The batching, TensorRT optimization, and tensor handling are all still Triton's job. Ray adds the routing and autoscaling layer on top.
+
+In the customer PoC that prompted this: six models that previously each had a dedicated GPU now share one L4. Same Triton configs. 50% lower GPU cost.
+
+## Where this breaks down
+
+Fractional GPU sharing is a time-sharing mechanism. When replicas are active simultaneously, they compete for the same physical compute and memory bandwidth. If all six models get hit at the same time at high QPS, they will contend.
+
+The workload fit is narrow on the high end: many small or bursty models, embedding endpoints, low-QPS internal services, rerankers that see traffic in bursts with quiet periods in between. In those cases, the replicas rarely peak simultaneously, and the sharing overhead is negligible.
+
+The wrong fit is one large LLM at sustained high QPS. If a model wants all the GPU's compute continuously, packing additional replicas onto the same device degrades everyone.
+
+The question to ask: do these models peak at the same time? If yes, keep them separate. If they're staggered or bursty, fractional scheduling reclaims the idle capacity that one-model-per-GPU leaves on the table.
