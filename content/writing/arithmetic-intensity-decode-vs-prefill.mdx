@@ -9,8 +9,6 @@ image: /blog_images/arithmetic-intensity-hero.jpg
 
 Every GPU has two bottlenecks, and every LLM inference workload hits both of them — just at different moments. Prefill saturates compute. Decode saturates memory bandwidth. The same hardware, the same model weights, but two completely different performance regimes. Until I dug into arithmetic intensity, I was treating these as the same problem. They're not.
 
-![GPU arithmetic intensity: decode vs prefill regimes](/blog_images/arithmetic-intensity-hero.jpg)
-
 ## Arithmetic intensity in one line
 
 Arithmetic intensity is FLOPs performed divided by bytes moved from memory. That ratio determines which resource your GPU exhausts first. Every GPU has its own ops:byte ceiling — on an A100 that's roughly 200–300 FLOP/byte; on an H100, around 295 FLOP/byte. If your operation's arithmetic intensity is above that number, you're compute-bound: the math units are the constraint. Below it, you're memory-bound: the hardware spends most of its time waiting for data to arrive from HBM, not doing math.

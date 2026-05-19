@@ -7,8 +7,6 @@ published: true
 image: /blog_images/stage-tax-hero.jpg
 ---
 
-![Batch inference pipeline with streaming vs staged execution](/blog_images/stage-tax-hero.jpg)
-
 A batch inference pipeline with 3 steps: decode images (20 min), resize (10 min), GPU inference (5 min). Total wall time: 35 minutes. GPU did useful work for 5 of them. That's 14% utilization. The other 30 minutes? The GPU was idle, waiting for the CPU stages to finish processing the entire dataset before a single batch could reach it.
 
 That idle time has a name: the Stage Tax.
