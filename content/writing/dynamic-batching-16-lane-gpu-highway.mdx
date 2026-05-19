@@ -1,0 +1,72 @@
+---
+title: 'Dynamic request batching: a 16-lane highway is not the same as 16 cars'
+description: 'Single-request inference loads the model from HBM, does a tiny bit of math, and leaves the GPU idle. Dynamic batching trades 10–100ms of queueing for the matrix-matrix workload GPUs were actually designed to run.'
+date: 2026-05-19
+tags: ['ray', 'gpu', 'inference', 'optimization', 'anyscale']
+published: true
+image: /blog_images/dynamic-batching-hero.jpg
+---
+
+An e-commerce company had A100s running at 20% GPU utilization. They asked me why. I told them: you built a 16-lane highway, then let one car through at a time.
+
+They turned on dynamic request batching. Saved $8K/month.
+
+## The single-request waste
+
+Every inference request follows the same path. Load model weights from high-bandwidth memory into the GPU's compute units, run the forward pass, return the result. Then repeat from scratch for the next request.
+
+That weight-loading step is not cheap. A100 HBM bandwidth is fast, but loading hundreds of gigabytes of parameters per request adds up. When you process requests one at a time, every single request pays the full memory-bandwidth cost of loading the model.
+
+Meanwhile, GPUs are built for matrix-matrix operations — large, regular, parallelizable math across thousands of cores. Feeding them one input vector at a time is like running a 64-lane processor instruction on a single element. The hardware is present and allocated; it just isn't doing the work it was designed for.
+
+## What batching costs and what it buys
+
+Dynamic batching is a deliberate queue. Instead of dispatching each request the moment it arrives, the server holds incoming requests for a window — typically 10–100ms — and releases them together when the batch fills or the timeout hits.
+
+That window is the trade. You're adding latency to individual requests in exchange for throughput across all of them. The reason the trade is worth it: loading model weights costs the same amount of time whether you're about to run 1 forward pass or 64. Batching spreads that fixed cost across every request in the batch. The math also shifts from matrix-vector (single input) to matrix-matrix (batched input), which is the operation GPUs are actually optimized for.
+
+The relationship is nonlinear. A 50ms queue window can deliver 8x throughput improvement. GPU utilization stops looking like a flatline and starts filling the available compute.
+
+## The numbers that have shown up in practice
+
+The 8x claim isn't theoretical. The pattern has shown up across different scales and contexts.
+
+Anthropic reported 9x throughput improvement on Claude 3 in production from batching. Pinterest moved from 10–25% GPU utilization to 75%+ on the same hardware — no additional GPUs, no model changes. NVIDIA's Triton documentation cites 3.7x gains just from enabling dynamic batching in the server config.
+
+Across implementations, the range lands at 4–14x throughput on identical hardware and models. The spread comes from workload shape: how variable request timing is, how large the model is relative to available HBM, what batch sizes saturate the GPU.
+
+The 20% utilization case at the top is exactly what this pattern looks like before the fix. The hardware isn't undersized — the execution model is wrong.
+
+## Wiring it up
+
+The implementation is two parameters: `batch_size` and `wait_timeout`.
+
+`batch_size` sets the maximum number of requests to group into a single forward pass. `wait_timeout` (or its equivalent — the name varies by framework) sets how long the server waits to fill the batch before flushing whatever it has.
+
+In **Ray Serve**, you set these on the deployment:
+
+```python
+@serve.deployment(
+    ray_actor_options={"num_gpus": 1},
+    max_ongoing_requests=64,
+)
+class InferenceDeployment:
+    @serve.batch(max_batch_size=32, batch_wait_timeout_s=0.05)
+    async def handle_batch(self, inputs: list):
+        return self.model(inputs)
+```
+
+In **NVIDIA Triton**, it's a config entry in the model repository:
+
+```
+dynamic_batching {
+  max_queue_delay_microseconds: 50000
+  preferred_batch_size: [8, 16, 32]
+}
+```
+
+Both give you the same lever: hold requests briefly, dispatch them together, let the GPU do the work it's good at.
+
+---
+
+If your GPU utilization is below 50% on an inference workload, check whether requests are being processed one at a time. Measure it. Then turn on dynamic batching with a 50ms timeout and see where utilization lands.
