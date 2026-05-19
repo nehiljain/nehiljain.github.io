@@ -1,0 +1,38 @@
+---
+title: 'Two GPUs in one: why decode is memory-bound and prefill is compute-bound'
+description: 'Every LLM inference deployment runs into the same wall twice — once during prefill, once during decode. Understanding arithmetic intensity is the difference between throwing more GPUs at it and actually fixing it.'
+date: 2026-05-19
+tags: ['inference', 'gpu', 'anyscale', 'optimization']
+published: true
+image: /blog_images/arithmetic-intensity-hero.jpg
+---
+
+Every GPU has two bottlenecks, and every LLM inference workload hits both of them — just at different moments. Prefill saturates compute. Decode saturates memory bandwidth. The same hardware, the same model weights, but two completely different performance regimes. Until I dug into arithmetic intensity, I was treating these as the same problem. They're not.
+
+![GPU arithmetic intensity: decode vs prefill regimes](/blog_images/arithmetic-intensity-hero.jpg)
+
+## Arithmetic intensity in one line
+
+Arithmetic intensity is FLOPs performed divided by bytes moved from memory. That ratio determines which resource your GPU exhausts first. Every GPU has its own ops:byte ceiling — on an A100 that's roughly 200–300 FLOP/byte; on an H100, around 295 FLOP/byte. If your operation's arithmetic intensity is above that number, you're compute-bound: the math units are the constraint. Below it, you're memory-bound: the hardware spends most of its time waiting for data to arrive from HBM, not doing math.
+
+Knowing which side of that ceiling you're on tells you where to look for improvements. The wrong diagnosis leads to the wrong fix.
+
+## Prefill: compute saturates
+
+During prefill, the model processes all N tokens of the prompt in one parallel pass. The weight matrices — say, a `[d_model, d_model]` projection — get loaded from HBM once and then reused across all N tokens simultaneously. The FLOPs for that operation scale as N · d², but the bytes moved scale as d² (you load the weights once regardless of sequence length). Arithmetic intensity is therefore proportional to N. For a prompt of a few hundred tokens with a large model, intensity clears the ops:byte ceiling by a comfortable margin. Attention compounds this further: it's quadratic in N, which only pushes intensity higher.
+
+The result: prefill is compute-bound. The math units are doing useful work, and the bottleneck is how fast the tensor cores can execute. Scaling to longer prompts makes this worse in compute terms, but from an efficiency standpoint, you're at least getting full utilization.
+
+## Decode: HBM saturates
+
+Decode is different in a way that matters. You generate one token at a time. The same `[d_model, d_model]` weight matrices still have to be streamed from HBM on every single step, but now you're performing roughly 2 · d² FLOPs against them — because you're operating on a single token vector, not N of them. Arithmetic intensity collapses to something close to 2 FLOP/byte. You're moving gigabytes of weights to do almost no math.
+
+Then add the KV cache. It lives in HBM, and it gets read in full on every decode step. For a large model at long contexts — think LLaMA-3 70B at 128K tokens — the KV cache alone can be tens of gigabytes, competing directly with the model weights for the same HBM bandwidth budget. The longer the context, the worse the memory pressure.
+
+This is why decode feels slow relative to prefill even on fast hardware. The GPU is fast. The memory bus is the bottleneck.
+
+## Why this matters for your inference bill
+
+The bulk of what inference engineers are actually working on — PagedAttention, quantization, speculative decoding, continuous batching, chunked prefill — traces back to this same root cause. Almost all of it is either raising decode's arithmetic intensity (so you do more math per byte of HBM traffic) or restructuring how work is scheduled to amortize memory costs across more tokens.
+
+If you're diagnosing latency in an inference deployment, check which phase is hurting. Prefill latency is a compute problem: more FLOP/s or shorter prompts. Decode latency is a memory problem: reduce the KV cache footprint, increase batch size to pack more useful work per weight load, or use techniques like speculative decoding to change the ratio of math to memory traffic. Treating them as the same problem wastes time and money.
