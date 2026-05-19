@@ -9,11 +9,11 @@ image: /blog_images/triton-fractional-gpu-hero.jpg
 
 ![Six Triton Inference Servers sharing one L4 GPU via Ray Serve fractional scheduling](/blog_images/triton-fractional-gpu-hero.jpg)
 
-Most ML teams deploy one model per GPU. The L4 has 24 GB of VRAM; a typical embedding model uses 2–4 GB of it. The remaining 20 GB sits idle until the next request arrives. It's the same logic as renting a six-bedroom house and sleeping in one room — but at GPU prices, the waste shows up in your bill every hour.
+The L4 has 24 GB of VRAM; a typical embedding model uses 2–4 GB of it. The remaining 20 GB sits idle until the next request arrives. It's the same logic as renting a six-bedroom house and sleeping in one room — but at GPU prices, the waste shows up in your bill every hour.
 
 The alternative: run six Triton Inference Servers on a single L4, with no MIG, no hardware partitioning, and about 300 lines of code to wire up routing and autoscaling.
 
-## Why one-model-per-GPU is the wrong default
+## The cost of idle VRAM
 
 The reflex makes sense on the surface. GPU memory is finite, isolation feels safe, and Triton's performance story is compelling enough that teams want to give each model its own clean environment.
 
