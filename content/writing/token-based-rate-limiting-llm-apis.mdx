@@ -1,0 +1,55 @@
+---
+title: 'Token-based rate limiting for LLM APIs: three architectures, one trade-off'
+description: 'Request-count rate limits stop making sense when one prompt costs 10 tokens and another costs 10,000. Token-based limits work, but where you enforce them — API gateway, LiteLLM proxy, or in-process with Ray Serve — changes the latency you pay on every request.'
+date: 2026-05-19
+tags: ['ray', 'inference', 'mlops', 'anyscale']
+published: true
+---
+
+A customer asked me about rate-limiting their LLM API. Specifically: "Why would I chain deployments instead of separate services for rate limiting?" I fumbled the answer in the moment. Here's what I should have said.
+
+## Why request-count limits stopped working
+
+Traditional rate limiting counts requests. One request per second, one hundred requests per minute — the unit is the same regardless of what's inside the request.
+
+That breaks with LLMs. One prompt uses 10 tokens. Another uses 10,000. Same request count, 1000× different compute cost. A user who sends one massive context window per minute is nowhere near "one request per minute" in terms of actual resource consumption, but a request-count limiter treats them identically.
+
+Token-based rate limiting is the fix: track how many tokens each user or team consumes, and enforce limits on that quantity instead of on request counts. The token count is the right unit because it's what drives inference cost and GPU utilization.
+
+The question is where in the stack you do the counting.
+
+## Redis plus API gateway
+
+The default approach for teams that already run an API gateway (Kong, NGINX, a custom FastAPI layer) is to add Redis as a shared token counter. The request comes in, the gateway increments a counter in Redis, checks whether the user is over their limit, and either routes or rejects.
+
+This works, and it's operationally familiar. The cost is service count and latency. You're running three services — the model server, the gateway, and Redis — and every request touches Redis twice: once to read the current count, once to write the new total. In a clustered Redis setup, worst-case latency for those two operations runs 80–100ms. That's overhead on every single request, paid before the model sees the prompt.
+
+If you're not already on a clustered setup, that number improves, but the architectural complexity doesn't go away. Two database round-trips per request is a floor, not a ceiling.
+
+## LiteLLM proxy
+
+LiteLLM ships with token-based rate limiting built in. You configure limits per user or team in a YAML file — no custom gateway code, no Redis wiring. It handles the counting internally and supports most major model providers behind a unified interface.
+
+This is probably where most teams should start. Two services instead of three, a config file instead of custom middleware, and the rate-limiting logic is maintained by someone else.
+
+The trade-off is latency overhead from adding a proxy hop, and the LiteLLM process becoming a bottleneck if your traffic grows significantly. For many teams at moderate scale, neither of those is a real problem. The operational simplicity is worth it.
+
+## Ray Serve, chained
+
+If you're already running Ray Serve, there's a third option: chain the rate limiter directly to the model deployment in a single pipeline.
+
+The mechanism is Ray Serve's deployment graph. The rate limiter and the model are separate deployments that scale independently, but they run in the same Ray cluster and communicate in-process rather than over the network. Token counts stay in memory inside the rate limiter replica rather than in an external store.
+
+The latency difference is significant: ~0.1ms for an in-memory check versus 1–3ms for a Redis round-trip. Over thousands of requests, that gap compounds. You're also down to one config, one deployment command, and one place to look at metrics when something goes wrong.
+
+The rate limiter and model scale independently, which matters if you want to run multiple model replicas but only a single rate limiting coordinator, or vice versa.
+
+## Picking one
+
+The architecture choice comes down to two questions: what you're already running, and what latency budget you have.
+
+If you're not on Ray, start with LiteLLM. The built-in token limits, YAML config, and two-service setup beat building your own Redis-backed gateway almost every time, and you can migrate later if you outgrow it.
+
+If you're already on Ray and need enforcement below one millisecond — high-throughput serving, tight SLA requirements, or a setup where that Redis round-trip is genuinely in your critical path — chained deployments make sense. You get sub-ms enforcement without adding infrastructure.
+
+The Redis plus API gateway path is the right answer if you have a gateway you can't replace and Redis is already in your stack. Otherwise, it's the most complex of the three options for the least differentiated result.
