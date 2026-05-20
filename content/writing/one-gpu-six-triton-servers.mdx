@@ -19,6 +19,8 @@ But most real serving workloads are bursty and low-QPS — embedding endpoints, 
 
 The cost isn't just wasted VRAM. You're also paying for the instance, managing six separate deployments, and writing custom routing and health-check logic every time you add a model.
 
+![One model per GPU strands most of the VRAM and the compute on a typical L4.](/blog_images/triton-ray-page1.jpg)
+
 ## What Triton and Ray Serve each do
 
 They solve different problems at different layers.
@@ -29,6 +31,8 @@ Ray Serve handles everything above the GPU: routing, autoscaling, pipeline compo
 
 These aren't competing options. They operate at different layers.
 
+![Triton owns GPU execution; Ray Serve owns everything above it.](/blog_images/triton-ray-page2.jpg)
+
 ## Stacking them: Triton inside Ray Serve replicas
 
 The mechanism is NVIDIA's in-process Python API. Instead of launching a standalone Triton server process, you instantiate Triton directly inside a Ray Serve deployment class. The `InferenceServerContext` starts up inside the replica's Python process, loads the model repository, and handles batching. Ray Serve owns the replica lifecycle, routes requests to it, and scales it up or down.
@@ -38,6 +42,8 @@ The GPU scheduling primitive is `num_gpus` on the Ray deployment decorator. Sett
 The Triton model configs stay unchanged. The batching, TensorRT optimization, and tensor handling are all still Triton's job. Ray adds the routing and autoscaling layer on top.
 
 In the customer PoC that prompted this: six models that previously each had a dedicated GPU now share one L4. Same Triton configs. 50% lower GPU cost.
+
+![Six Triton replicas sharing one L4 via Ray Serve's fractional GPU scheduler.](/blog_images/triton-ray-page3.jpg)
 
 ## Where this breaks down
 
