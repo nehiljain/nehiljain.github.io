@@ -10,7 +10,7 @@ published: true
 
 You can say, "What the hell Nehil! Yesterday you told me, I need to add all this stuff to the checkpoint now you tell it it wastes resources?"
 
-Dont worry here is the solution, **async checkpointing cuts overhead from 40min to <1sec.**
+Dont worry here is the solution, **async checkpointing cuts overhead from 40min to &lt;1sec.**
 
 Lets talk about how to checkpoint without killing throughput.
 
@@ -32,7 +32,7 @@ The problem as always is: Your **$600/hour GPU cluster** sits idle.
 
 **Step 2 (Async, Slow): CPU → Disk upload.** Background thread handles I/O. Training continues immediately.
 
-Takes 30–40min but you don't wait. Your perceived overhead drops from 40min to <1sec.
+Takes 30–40min but you don't wait. Your perceived overhead drops from 40min to &lt;1sec.
 
 **That's 10x–23x speedup.**
 
