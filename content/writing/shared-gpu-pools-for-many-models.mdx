@@ -7,44 +7,32 @@ published: true
 image: /blog_images/shared-gpu-pool-hero.jpg
 ---
 
-A personalization team asked me to review their setup. 37 fine-tuned model variants, one GPU each, 22% utilization across the fleet. They were paying for 37 GPUs to run workloads that, in aggregate, needed maybe eight.
+A personalization team asked me to review their setup. **37 fine-tuned model variants. 37 GPUs. 22% utilization across the fleet.**
 
-The culprit is the default pattern: one model per GPU. It feels safe. Isolation is clean, routing is simple, memory pressure is predictable. But for fine-tuned variant fleets — where traffic is uneven and models are structurally similar — it leaves most of your GPUs sitting idle most of the time.
+The fix is **share GPUs across models**.
 
-## When one-per-GPU stops making sense
+## How it works
 
-The one-model-per-GPU assumption holds when a single model saturates the device. A large LLM at production QPS will use every GB of VRAM and every compute cycle. Sharing nothing makes sense.
+The idea is simple. When a request comes in, the system checks if that model is already loaded somewhere. If yes, route there. If no, pick a GPU, load the model, run inference.
 
-Fine-tuned variant fleets are different. The models are small relative to the GPU. Traffic is spread across many variants, often with a power-law distribution: a handful of popular variants see constant traffic while the long tail gets occasional requests. Most GPUs spend most of their time waiting.
+Three things happen:
 
-At 22% utilization, four out of every five GPU-hours are billable but idle. You pay for the whole fleet to serve the peak of each model, even when those peaks almost never align.
+- **Models load on demand**
+- **Frequently-used ones stay in memory**
+- **Least-used ones get swapped out to make room**
 
-## The pool as an LRU cache
-
-The fix is to stop assigning models to GPUs and start assigning GPUs to requests.
-
-When a request arrives, the system checks whether that model is already loaded somewhere in the fleet. If yes, it routes there. If no, it picks a GPU, loads the model, and runs the request. When GPUs fill up, the least-recently-used model gets evicted to make room for the next load.
-
-Each GPU holds 3–5 models concurrently depending on model size and available VRAM. The fleet now serves the same 37 models from a smaller number of devices, because at any given moment only a fraction of variants are active.
-
-In tests with 100 models, this approach handled 2× more requests than the one-model-per-GPU baseline. That number will vary with your traffic patterns and model sizes, so treat it as a directional signal rather than a guarantee.
+Each GPU holds about **3–5 models at once**.
 
 ![Routing and eviction flow for a shared GPU pool](/blog_images/shared-gpu-pool-2.jpg)
 
-## What you trade away
+## The numbers
 
-The tradeoff is cold-start latency. When a request hits a model that isn't currently loaded, the system has to load the weights before it can run inference. That takes seconds. Subsequent requests to the same model take milliseconds — the model is warm and the routing layer sends them to the GPU it already occupies.
+In tests with 100 models, this approach handled **2x more requests** than one-model-per-GPU. Your results will vary, so test with your own workload.
 
-For most fine-tuned variant fleets, that's an acceptable deal. The popular models stay warm because they see enough traffic to survive LRU eviction. The long-tail models pay the cold-start tax on their first request, but they were already slow in a different sense: you were paying a full GPU-hour for every hour they existed, whether or not they served a single request.
+## The tradeoff
 
-Two things to watch under burst traffic. If many users hit cold models simultaneously, you get a loading queue — the system serializes loads onto available GPUs and the cold-start latency stacks. And if your request SLA is tight (sub-100ms P99 for all variants including cold), the seconds-range cold-start is a hard problem that pooling alone doesn't solve. Prewarming the most important variants is the usual mitigation.
+The tradeoff is simple: **first request to a cold model takes seconds. After that, milliseconds.**
 
-## Who this fits
+If you can live with that, you're good.
 
-The pattern works best when three conditions hold together: many fine-tuned variants of a similar base model, bursty or uneven per-model traffic, and fleet utilization below 30%.
-
-Below 30% is the rough threshold where the gains from packing models outweigh the operational overhead. Above that, you may be better served by fractional GPU scheduling (splitting VRAM between concurrent replicas) rather than time-sharing via LRU swap.
-
-If you're running 20+ fine-tuned variants and your monitoring shows fleet utilization in the 20–30% range, the math is usually straightforward: implement shared pooling, reduce GPU count, watch your bill. The 37-GPU fleet in this case was a reasonable candidate to run on half the hardware — the 22% utilization number made the case before we changed a single line of serving code.
-
-The decision rule: if utilization is below 30% and you have more than ten variant models, measure your per-variant traffic distribution. If the top 20% of variants handle 80% of traffic, pooling will reclaim most of the idle capacity without touching your hot-path latency.
+If you're running a bunch of model variants at under 30% utilization, **this might cut your bill in half.**

@@ -6,48 +6,46 @@ tags: ['ray', 'training', 'gpu', 'mlops', 'anyscale']
 published: true
 ---
 
-Training a large model and hitting 80%+ wall-time overhead from checkpointing sounds like a pathological case. It isn't. At scale, synchronous I/O serializes your training loop against your storage system, and storage almost always loses. Your $600/hour GPU cluster sits idle while a CPU thread moves bytes to disk.
+**Checkpointing can waste up to 80+% of training time at scale.**
 
-## Why sync checkpointing dominates wall time
+You can say, "What the hell Nehil! Yesterday you told me, I need to add all this stuff to the checkpoint now you tell it it wastes resources?"
 
-The default checkpoint path is three sequential operations:
+Dont worry here is the solution, **async checkpointing cuts overhead from 40min to <1sec.**
 
-1. GPU → CPU: transfer model state off the accelerator
-2. CPU → Disk: serialize and write to storage
-3. Training loop: wait for both to finish before continuing
+Lets talk about how to checkpoint without killing throughput.
 
-Step 1 is fast — modern NVLink and PCIe bandwidth can move a checkpoint's worth of state in a few seconds. Step 2 is not. At scale, writing a full model state to network storage can take 30–40 minutes. Until both finish, your GPUs are idle.
+## The bottleneck is synchronous I/O
 
-For infrequent checkpointing — say, every few hundred steps — you might accept this as a one-time cost. But the moment you want fault tolerance at high frequency, or you're running a long job where checkpoints happen regularly, the overhead compounds. One 40-minute stall every N steps is a fixed tax on every training run.
+Default way blocks your training loop:
 
-## The async split
+- GPU → CPU: transfer model state
+- CPU → Disk: write to storage
+- Training waits for both steps to finish
 
-Async checkpointing separates the two steps and only blocks training on the fast one.
+At scale, one checkpoint takes **30–40 minutes**.
 
-**Step 1 (sync, ~1 second):** GPU → CPU transfer. Training pauses briefly while model state moves into CPU memory. This stays synchronous because you need a consistent snapshot — you can't copy model weights while a gradient update is in-flight.
+The problem as always is: Your **$600/hour GPU cluster** sits idle.
 
-**Step 2 (async, 30–40 minutes):** CPU → Disk upload. A background thread handles the I/O. Training resumes immediately after step 1 finishes. The disk write happens concurrently with the next N steps of training.
+## Async checkpointing splits this into 2 steps
 
-Perceived overhead drops from 40 minutes to under a second — a 10×–23× improvement on the checkpoint stall alone. The I/O work is still happening; you just stopped waiting for it.
+**Step 1 (Sync, Fast): GPU → CPU transfer.** Blocks training briefly (~1 second). Model state moves to CPU memory.
 
-Ray Train handles this pattern natively. The framework manages the background upload thread and exposes the interface through `report()`.
+**Step 2 (Async, Slow): CPU → Disk upload.** Background thread handles I/O. Training continues immediately.
 
-## What this unlocks
+Takes 30–40min but you don't wait. Your perceived overhead drops from 40min to <1sec.
 
-Frequent checkpointing becomes free in the perceived-overhead sense. When the sync cost is ~1 second, there's no reason to checkpoint every 500 steps instead of every 100, or every 100 instead of every 10. You can checkpoint every step if storage bandwidth supports it.
+**That's 10x–23x speedup.**
 
-That changes fault recovery. A job that checkpoints every step loses at most one step on failure. For expensive pre-training runs, the difference between recovering from step 10,000 and step 8,500 is real money. You also get the ability to roll back on divergence rather than restarting from a distant save.
+The Ray Train pattern handles this.
 
-## When async still bites you
+## Pre-reqs for this to work
 
-Three constraints to keep in mind before relying on this pattern.
+- **CPU RAM buffer** (checkpoint must fit in memory)
+- **Storage I/O bandwidth** (must drain before next checkpoint)
+- Each `report()` blocks until previous upload completes (prevents memory overflow)
 
-**CPU RAM headroom.** The checkpoint has to fit in CPU memory during the async upload window. If your model state is large and you're running tight on host RAM, the copy will fail or force you back to synchronous behavior. Size your CPU memory to hold at least one full checkpoint.
+This unlocks frequent checkpointing. Checkpoint every 100 steps, every 10 steps, even every step.
 
-**Storage I/O bandwidth.** The background upload needs to finish before the next checkpoint triggers. If your checkpointing interval is shorter than your upload time, you'll stall — the disk write still has to complete eventually. The constraint is that you need `checkpoint_interval × step_time > upload_duration`. At 30–40 minute upload times, very aggressive intervals can still cause pressure.
+No performance penalty.
 
-**`report()` backpressure.** In Ray Train, each `report()` call blocks until the previous background upload finishes. This is intentional — it prevents memory from filling up with queued checkpoints if uploads fall behind. If you call `report()` faster than your storage can drain, you will feel it. This is a safety valve, not a bug, but it's the mechanism worth understanding if you see unexpected stalls.
-
----
-
-Measure your checkpoint overhead before assuming it's acceptable. If it's over 10 seconds, you're paying for I/O wait in GPU-hours. The fix is straightforward — async checkpointing in Ray Train is a configuration change, not a rewrite. The CPU RAM and storage bandwidth constraints are real but plannable. What's not plannable is a 40-minute stall showing up as a surprise in your training timeline.
+**What's your checkpoint overhead? Measure it. Switch to async if it's >10 seconds.**

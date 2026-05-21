@@ -7,48 +7,26 @@ published: true
 image: /blog_images/stage-tax-hero.jpg
 ---
 
-A batch inference pipeline with 3 steps: decode images (20 min), resize (10 min), GPU inference (5 min). Total wall time: 35 minutes. GPU did useful work for 5 of them. That's 14% utilization. The other 30 minutes? The GPU was idle, waiting for the CPU stages to finish processing the entire dataset before a single batch could reach it.
+Your batch inference pipeline has 3 steps. Decode images: **20 min**. Resize: **10 min**. GPU inference: **5 min**. Total wall time: **35 minutes**. Your GPUs did useful work for 5 of them. That's **14% utilization**. The other 30 minutes? Idle. Waiting for CPU preprocessing to finish the entire dataset before a single batch reaches the GPU.
 
-That idle time has a name: the Stage Tax.
-
-## The numbers
-
-The pipeline above is not contrived. I've seen this shape repeatedly in batch workloads — image processing, embedding pipelines, video transcription. The breakdown is always the same: CPU preprocessing is slow, GPU inference is fast, and the two never overlap.
-
-Five of thirty-five minutes is 14% GPU utilization. On a job you're paying GPU-hours for, 86% of that bill is idle time. The hardware is not the bottleneck. The execution model is.
+This is the **Stage Tax**.
 
 ## Why it happens
 
-Most pipelines run each operator to completion before starting the next. Decode every image, write to disk. Resize every image, write to disk. Then load everything into GPU memory and infer.
+It happens because most pipelines run each operator to completion before starting the next. Decode every image, write to disk. Resize every image, write to disk. Then load everything into GPU memory and infer.
 
-Each stage blocks the next. Your CPUs and GPUs never overlap. Parallel hardware running in series.
+Each stage blocks the next. Your CPUs and GPUs never overlap.
 
-The design is intuitive — it's how you'd write a script if you weren't thinking about throughput. Read all inputs. Transform all inputs. Run inference on all inputs. Simple to reason about, easy to debug. But the execution pattern means your GPU waits behind two full dataset sweeps before doing any work.
+Parallel hardware running in series.
 
-## The fix: stream, don't stage
+## The fix
 
-Instead of staging data between operators, stream it. The CPU finishes the first batch in seconds. The GPU starts immediately. While the GPU infers batch 1, the CPU preprocesses batch 2. Both stay busy until the dataset is done.
+The fix is streaming data between operators instead of staging it.
 
-Same hardware. Same code logic. Pipeline drops from 35 minutes to roughly 21. GPU utilization goes from 14% to near-continuous.
+CPU finishes the first batch in seconds. GPU starts immediately. While the GPU infers batch 1, the CPU preprocesses batch 2. Both stay busy until the dataset is done.
 
-The bottleneck was never compute. It was dead time between stages where nothing happened.
+Same hardware. Same code logic. **Pipeline drops from 35 minutes to roughly 21.** GPU utilization goes from 14% to near-continuous.
 
-Frameworks like Ray Data implement this pattern through pipelined execution — operators run concurrently with bounded queues between them. When the GPU finishes a batch, the next one is already waiting. The CPU never has to wait for the GPU either; if inference falls behind, backpressure slows the upstream operators rather than letting memory fill up unboundedly.
+The bottleneck was never compute. It was the dead time between stages where nothing happened.
 
-## How to spot the Stage Tax in your own pipeline
-
-A few signals that your pipeline is paying it:
-
-**Stage-to-disk writes between operators.** If your pipeline writes intermediate files after each stage — a processed images directory, a resized frames folder — that's a structural sign. The write-read cycle between stages forces full dataset completion before the next operator can begin.
-
-**GPU utilization below 50% on a job you assume is GPU-bound.** If you're running batch inference and GPU utilization is low, the GPU isn't underprovisioned — it's waiting. Pull a utilization timeline. If you see a long flat section at zero before utilization climbs, that's the upstream CPU stages draining.
-
-**Wall time that doesn't improve when you add GPUs.** This is the clearest signal. If doubling GPU count doesn't halve your job time, the bottleneck is elsewhere. Adding GPUs to a staged pipeline doesn't help if the CPU preprocessing is the actual gate.
-
-**No backpressure mechanism.** If your pipeline has no concept of bounded queues or flow control between stages, streaming isn't happening — data moves in bulk, not incrementally.
-
-**A job where preprocessing time dwarfs inference time.** In the example above, preprocessing (30 min) is 6x inference (5 min). That ratio determines how much idle time you're carrying. A 2:1 ratio is already paying a meaningful Stage Tax.
-
----
-
-If your batch pipeline preprocesses everything before inference starts, measure the ratio. The fix doesn't require different hardware or a rewrite — it requires execution to overlap. Streaming between operators is the mechanism. The question is whether your framework and pipeline design support it.
+If your pipeline preprocesses everything before inference starts, you're paying the Stage Tax. The question is how much.

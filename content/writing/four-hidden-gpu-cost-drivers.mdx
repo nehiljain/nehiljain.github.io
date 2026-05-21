@@ -7,56 +7,46 @@ published: true
 image: /blog_images/gpu-cost-drivers-hero.jpg
 ---
 
-"We negotiated a lower $/hr on our GPU contract." Good. You're still overpaying.
+*"We negotiated a lower $/hr on our GPU contract."*
 
-Serious GPU work pushes you multi-cloud — availability gaps, pricing swings, the need to run where the hardware actually is. Once you're across providers, four cost drivers compound underneath the hourly rate. None of them show up in the contract you just negotiated. Most teams don't track them until they're large.
+Cool. You're still overpaying.
 
-## Cross-cloud egress
+Serious GPU work pushes you multi-cloud. Once you're across providers, **4 cost drivers compound underneath the hourly rate**. None of them are GPU pricing. Most teams don't track these.
 
-Ingress is free. Egress is $0.08–$0.12 per GB, depending on the provider pair and region.
+## Data transfer between clouds costs $55K+/year
 
-An enterprise moving 50TB per month between clouds pays $55K+ per year in data transfer fees alone. That's before you count model checkpoints, training datasets, and artifact stores that live on one cloud while the compute runs on another. Every hop between providers has a price. Nobody budgets for it until the quarter-end reconciliation comes in.
+Data ingress is free. Egress costs **$0.08–$0.12/GB**.
 
-The fix is structural: decide where your artifacts live before you pick where your jobs run. Keeping training data and checkpoints on the same provider as the training job eliminates most of the egress. The teams that pay $55K are moving the same data back and forth because the infrastructure grew faster than the decision about where things should live.
+An enterprise moving **50TB/month** between clouds pays **$55K+/year** in data transfer fees alone. Checkpoints, training data, model artifacts. Every hop between providers adds to the bill.
 
-## Topology-blind scheduling
+Nobody budgets for it until it's too late.
 
-5ms of network latency cuts a 10 Gbps connection to 3.74 Gbps. On multi-node distributed training, wrong GPU topology causes 30–50% performance degradation.
+## Wrong GPU topology cuts training throughput 30–50%
 
-Most Kubernetes schedulers treat GPUs as opaque resources. There is no rack awareness, no NUMA awareness, no zone optimization — pods land wherever there's available capacity. On a single-node job that doesn't matter much. On a 16-node training run where the all-reduce gradient sync is the bottleneck, it matters enormously. Two nodes in the same rack communicate at full NVLink or InfiniBand speeds. Two nodes placed in different availability zones communicate over the same network as everything else.
+**5ms of network latency cuts a 10 Gbps connection to 3.74 Gbps.**
 
-The utilization numbers look fine. The jobs finish. But they finish 30–50% slower than they should, which means you're running them 30–50% longer, paying for 30–50% more GPU-hours to get the same model.
+Wrong GPU topology on multi-node distributed training causes **30–50% performance degradation**.
 
-Topology-aware scheduling is not a default. It requires explicit configuration — node selectors, affinity rules, or a scheduler that understands GPU topology. Most teams have never turned it on.
+Most Kubernetes schedulers treat GPUs as opaque black boxes. No rack awareness. No zone optimization. Pods land wherever there's space, not where they'd run fastest.
 
-## Peak-provisioned idle capacity
+## Average GPU utilization sits at 40%
 
-Average GPU utilization across the industry sits at 40%. Fewer than 10% of teams hit 85%+ utilization. The rest — 90%+ of teams — have between 30% and 50% of their AI compute budget reserved but idle.
+Teams provision for peak demand. Average utilization sits at **40%**.
 
-The pattern is predictable: provision for the peak training run, then use that capacity for everything else. The peak might happen twice a month. The rest of the time the hardware is allocated, the billing clock is running, and the GPUs are cold.
+Fewer than **10% of companies hit 85%+ GPU utilization**.
 
-The Stage Tax post covered one version of this: CPU preprocessing blocks GPU work, so utilization collapses even during jobs that are nominally running. Topology mismatch is another version: jobs run slower than they should, so you keep the cluster up longer. Peak provisioning is the third version and the most common one — the hardware itself is right-sized for a demand that rarely shows up.
+So **30–50% of AI compute budgets** go to reserved hardware sitting cold. You're paying for GPUs not training anything.
 
-The measurement question is: what does your utilization look like hour by hour over the last 30 days, not just during active training runs? Most teams have never pulled that chart.
+## Same chip, 10x price spread across providers
 
-## Same chip, ten times the price
+**H100: $2.99/hr on one provider. $32.77/hr on another. Same chip. 10x spread.**
 
-H100: $2.99/hr on one provider. $32.77/hr on another. Same chip. Same CUDA, same VRAM, same architecture. 10× spread.
+A100: **$1.89 vs $10.98**.
 
-A100: $1.89 vs $10.98.
+Single-cloud contracts mean you eat the spread.
 
-Single-cloud contracts mean you eat whatever spread exists between your provider's price and the market. Multi-cloud without active arbitrage means you're running on habit — you go to the same provider because that's where the credentials are configured, not because the price is right that week.
+---
 
-The price spread isn't static. It moves with spot availability, provider utilization, and how recently someone repriced their catalog. A team that checks prices once a quarter and routes jobs accordingly doesn't need perfect arbitrage to capture most of the gain.
+Even teams going multi-cloud still eat costs 1 through 3 if they don't address them.
 
-## What to look at first
-
-If you want to attack these in order, start with egress: pull three months of cloud bills and search for data transfer line items. This number is deterministic and often surprises people. If it's material, fix the data placement before optimizing anything else — the other three costs are all multiplicative on compute, but egress is a direct drain.
-
-Then check topology configuration on your largest distributed training jobs. If your scheduler has no rack or zone awareness configured, you're paying for jobs that run slower than the hardware allows.
-
-Utilization comes third. Pull GPU utilization hour by hour for the last 30 days, not just during training runs. If the average is below 60%, you have a provisioning or pipeline efficiency problem — the Stage Tax post covers the pipeline side.
-
-Price arbitrage is last, not because it's smallest, but because it's the most operationally complex to maintain. The spread is real, but acting on it requires multi-cloud routing infrastructure that most teams build later.
-
-The hourly rate is a vanity metric. It's the number that's easiest to put in a contract and hardest to connect to actual spend. These four costs are the layer underneath it. Most of the money is there.
+**The GPU hourly rate might be a vanity metric.**
