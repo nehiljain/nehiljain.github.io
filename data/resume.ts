@@ -7,7 +7,8 @@ export const DATA = {
   title: 'Member of Technical Staff',
   currentFocus: 'Scaling AI infrastructure for the enterprise',
   location: 'SF Bay Area',
-  email: 'hello@nehiljain.com',
+  // nehiljain.com lapsed in 2026 and its mail now goes to a third party. Add a new address to bring the Email links back.
+  email: '',
   description: "An ML platform engineer who loves solving problems for customers at Anyscale. I have been partnering with ML team and leaders to scale their AI solutions with Ray. I have been coding for over 10+ years. I love distributed systems and the startup ethos. Also a bit of sketchnoting and pickleball (these keep changing)",
   avatarUrl: '/nehil_profile_pic.jpg',
   contact: {
@@ -94,11 +95,11 @@ export const DATA = {
       start: 'Sep 2025',
       end: 'Present',
       highlights: [
-        'Field engineer for 10+ Fortune 500 Anyscale accounts on Ray, including Notion and Palo Alto Networks.',
-        'Own a multi-seven-figure ACV book and seven-figure qualified pre-sales pipeline.',
-        'Drove 6x growth at Notion by migrating Spark + OpenAI embeddings to Ray Data + self-hosted pipelines across 10M+ workspaces.',
+        'Field engineer for 10+ Fortune 500 accounts building on Ray.',
+        'Own a book of strategic accounts and a qualified pre-sales pipeline.',
+        'Drove 6x growth for a leading productivity-software customer by migrating Spark + OpenAI embeddings to Ray Data with self-hosted models.',
         'Shipped upstream Ray Data and Ray Serve fixes that unblocked customer training and serving workloads.',
-        'Core team member for Ray on the Roads; delivered SF workshop to 150+ engineers and converted Twitch from prospect to customer via a 4-hour custom workshop.'
+        'Core team member for Ray on the Roads; delivered SF workshop to 150+ engineers and helped win a new customer through a 4-hour custom workshop.'
       ],
       href: 'https://www.anyscale.com/'
     },
@@ -113,7 +114,7 @@ export const DATA = {
         'Shipped 120+ automated videos cutting content creation time 70% across 5 pilots; secured 1 paid pilot and 2 design partners.',
         'Placed in 4 SF AI hackathons: 1st at MongoDB GenAI ($2k, KinConnect), solo 1st at Luma AI, 2nd at E2B × Fireworks AI (ProoferX), 3rd at LangChain Agents & Compound AI Systems (LazyPMs) - featured by Fireworks AI as a triple-hackathon placer.'
       ],
-      href: 'https://demodrive.ai'
+      href: 'https://github.com/demodrive-ai'
     },
     {
       company: 'QuantumBlack, McKinsey',
@@ -189,12 +190,12 @@ export const DATA = {
     {
       industry: 'AI Infrastructure',
       tag: 'Autoresearch',
-      title: 'Notion Batch Embeddings Optimization',
+      title: 'Batch Embeddings Optimization at Scale',
       status: 'current',
       description:
-        "Ran an 80-experiment autoresearch-style sweep across Notion's AI search embedding pipeline (millions of pages, 10M+ workspaces), tuning Ray Data + self-hosted embedding throughput.",
+        "Ran an 80-experiment autoresearch-style sweep across a customer's AI search embedding pipeline (millions of pages), tuning Ray Data + self-hosted embedding throughput.",
       impact:
-        '3.2x wall-time speedup, 60% GPU cost reduction, and stable 10M-row processing - unlocked the ~250 → ~700 credits/day expansion across all Notion workspaces.',
+        '3.2x wall-time speedup, 60% GPU cost reduction, and stable 10M-row processing.',
       role: 'Member of Technical Staff',
       technologies: [
         'Ray Data',
@@ -210,9 +211,9 @@ export const DATA = {
       title: 'Sales Context DataHub - Agent at Scale',
       status: 'current',
       description:
-        'Built an agent-at-scale system over 7 fragmented internal sources (Gong, Slack, Pylon, Jira, Metronome, Salesforce, Notion) serving 30 Anyscale field engineers - Ray Data batch pipeline, recursive LLM summarization, dbt semantic layer, Claude agent skill, Streamlit app.',
+        'Built an agent-at-scale system over 7 fragmented internal sources (CRM, call recordings, support, ticketing, billing, chat and docs) for the field engineering team - Ray Data batch pipeline, recursive LLM summarization, dbt semantic layer, Claude agent skill, Streamlit app.',
       impact:
-        'Cut weekly account-review prep from 2h to 20min across 16 tracked accounts (50+ person-hours saved weekly). Caught a book-wide 5–6x consumption-burndown underreporting bug; exec-summary format adopted by leadership for broader CS/AE rollout.',
+        'Cut weekly account-review prep from 2h to 20min (50+ person-hours saved weekly); the exec-summary format was adopted by leadership for a broader rollout.',
       role: 'Member of Technical Staff',
       technologies: [
         'Ray Data',
@@ -230,16 +231,16 @@ export const DATA = {
       description:
         'Shipped a production-grade vector-DB connector to Ray OSS with column-oriented batching, memory-safe sort+slice implementation, and a PyArrow hash-order bugfix.',
       impact:
-        "Delivered faster write throughput and prevented silent data corruption, demonstrating Ray Data engineering work now part of open source and unblocking Notion's pipeline migration.",
+        "Delivered faster write throughput and prevented silent data corruption; now part of Ray open source (ray-project/ray#58910) and unblocked a customer's pipeline migration.",
       role: 'Member of Technical Staff',
       technologies: ['Ray Data', 'PyArrow', 'Python', 'AWS']
     },
     {
       industry: 'AI Infrastructure',
-      title: 'Notion EU Ray Service Outage Restore',
+      title: 'Production Ray Service Outage Restore',
       status: 'current',
       description:
-        "RCAd a 100%-timeout Ray service outage across Notion's EU production in under 3 hours by discovering a silent Python torch CUDA driver mismatch.",
+        "Root-caused a 100%-timeout Ray Serve outage in a customer's production region in under 3 hours by finding a silent PyTorch CUDA driver mismatch.",
       impact:
         'Outage restored in <3 hours; shipped a fail-fast torch.cuda.is_available() startup assertion as systemic mitigation.',
       role: 'Member of Technical Staff',
@@ -247,12 +248,12 @@ export const DATA = {
     },
     {
       industry: 'AI Infrastructure',
-      title: 'HeartFlow Ray Backpressure - Upstream Platform Fix',
+      title: 'Ray Data Backpressure - Upstream Platform Fix',
       status: 'current',
       description:
-        "Unblocked HeartFlow's CCTA clinical-imaging training across TBs of data by root-causing a prefetch-vs-consume OOM at 95.7% node memory. Shipped a dynamic-output-queue-size backpressure default upstream.",
+        "Unblocked a medical-imaging customer's training across TBs of data by root-causing a prefetch-vs-consume OOM at 95.7% node memory. Shipped a dynamic-output-queue-size backpressure default upstream.",
       impact:
-        'Replaced 20+ overnight manual restarts per training cycle with unattended sustained training - freed ML researchers and protected the Q1 renewal.',
+        'Replaced 20+ overnight manual restarts per training cycle with unattended sustained training, freeing ML researchers.',
       role: 'Member of Technical Staff',
       technologies: ['Ray Data', 'PyTorch', 'H100 GPUs', 'Kubernetes']
     },

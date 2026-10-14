@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PROD_URL = process.env.E2E_BASE_URL ?? 'https://nehiljain-com.pages.dev';
+const PROD_URL = process.env.E2E_BASE_URL ?? 'https://nehiljain.github.io';
 
 export default defineConfig({
   testDir: './e2e',

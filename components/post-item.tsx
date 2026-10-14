@@ -8,9 +8,8 @@ interface PostItemProps {
   tags?: string[];
   content?: string;
   image?: string;
-  index?: number;
 }
 
-export function PostItem({ index = 0, content, ...rest }: PostItemProps) {
-  return <EditorialRow post={{ ...rest, body: content }} index={index} />;
+export function PostItem({ content, ...rest }: PostItemProps) {
+  return <EditorialRow post={{ ...rest, body: content }} />;
 }

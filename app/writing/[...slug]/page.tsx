@@ -5,7 +5,6 @@ import Link from 'next/link';
 
 import '@/styles/mdx.css';
 import { Metadata } from 'next';
-import { siteConfig } from '@/config/site';
 import { siteMetadata } from '@/config/metadata';
 import { sortPosts } from '@/lib/utils';
 import { extractToc } from '@/lib/toc';
@@ -42,7 +41,7 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
-    authors: { name: siteConfig.author },
+    authors: { name: siteMetadata.author.name },
     openGraph: {
       title: post.title,
       description: post.description,
