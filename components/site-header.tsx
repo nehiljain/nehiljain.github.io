@@ -27,7 +27,9 @@ const SOCIAL = [
     label: 'Twitter',
     Icon: Icon.Twitter
   },
-  { url: `mailto:${DATA.email}`, label: 'Email', Icon: Icon.Mail }
+  ...(DATA.email
+    ? [{ url: `mailto:${DATA.email}`, label: 'Email', Icon: Icon.Mail }]
+    : [])
 ];
 
 export function SiteHeader() {

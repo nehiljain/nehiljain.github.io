@@ -7,7 +7,9 @@ const socials = [
   { key: 'GitHub', url: DATA.contact.social.GitHub.url, I: Icon.Github },
   { key: 'LinkedIn', url: DATA.contact.social.LinkedIn.url, I: Icon.LinkedIn },
   { key: 'Twitter', url: DATA.contact.social.Twitter.url, I: Icon.Twitter },
-  { key: 'Mail', url: `mailto:${DATA.email}`, I: Icon.Mail }
+  ...(DATA.email
+    ? [{ key: 'Mail', url: `mailto:${DATA.email}`, I: Icon.Mail }]
+    : [])
 ];
 
 export function SiteFooter() {

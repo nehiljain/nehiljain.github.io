@@ -62,18 +62,20 @@ export function MobileNav() {
                   {social.label}
                 </Link>
               ))}
-              <Link
-                href={`mailto:${DATA.email}`}
-                className={cn(
-                  buttonVariants({
-                    variant: 'ghost',
-                    size: 'sm'
-                  })
-                )}
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Contact
-              </Link>
+              {DATA.email && (
+                <Link
+                  href={`mailto:${DATA.email}`}
+                  className={cn(
+                    buttonVariants({
+                      variant: 'ghost',
+                      size: 'sm'
+                    })
+                  )}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Contact
+                </Link>
+              )}
             </div>
           </div>
         </div>

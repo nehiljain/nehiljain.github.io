@@ -26,9 +26,11 @@ export function HomeHero() {
               Read the writing <Icon.ArrowRight size={16} />
             </SolidBtn>
           </Link>
-          <Link href={`mailto:${DATA.email}`} className="no-underline">
-            <OutlineBtn>Say hello</OutlineBtn>
-          </Link>
+          {DATA.email && (
+            <Link href={`mailto:${DATA.email}`} className="no-underline">
+              <OutlineBtn>Say hello</OutlineBtn>
+            </Link>
+          )}
         </div>
       </div>
       <div className="relative grid place-items-center">

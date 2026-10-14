@@ -29,7 +29,9 @@ Personal site / blog built on **Next.js 14 (App Router) + Velite + MDX + Tailwin
 
 **UI.** shadcn/ui primitives in `components/ui/` (configured via `components.json`). Higher-level components live in `components/`. Path alias `@/*` maps to repo root (`tsconfig.json`).
 
-**Site metadata.** Two config files exist: `config/site.ts` (older shadcn template defaults — still imported in places) and `config/metadata.ts` (the active source of truth, used by `app/layout.tsx`). When updating site-wide title/description/social, edit `config/metadata.ts`.
+**Site metadata.** `config/metadata.ts` is the single source of truth (title, description, `siteUrl`, social), used by `app/layout.tsx` and post pages. The template's `config/site.ts` was removed.
+
+**Deploy.** GitHub Pages at https://nehiljain.github.io via `.github/workflows/pages.yml` on every push to `master`.
 
 **Sketchnotes.** `sketchnotes/` is a separate design system (not part of the Next app) — `DESIGN.md` defines a hand-drawn sketchnote brand (Macchiato Rose on Cabin Sketch) used for one-page technical illustrations. Each subdirectory is one sketchnote. Treat it as design assets, not runtime code.
 
