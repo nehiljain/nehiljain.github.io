@@ -1,0 +1,43 @@
+---
+title: 'Dynamic request batching: a 16-lane highway is not the same as 16 cars'
+description: 'Single-request inference loads the model from HBM, does a tiny bit of math, and leaves the GPU idle. Dynamic batching trades 10–100ms of queueing for the matrix-matrix workload GPUs were actually designed to run.'
+date: 2026-05-19
+tags: ['ray', 'gpu', 'inference', 'optimization', 'anyscale']
+published: true
+image: /blog_images/dynamic-batching-hero.jpg
+---
+
+An e-commerce company was running LLM inference on A100s. **GPU utilization: 20%.** They asked me why.
+
+I said: *"You built a 16-lane highway. Then you let one car through at a time."*
+
+They turned on dynamic request batching and **saved $8K/month.**
+
+## What's actually happening
+
+You load heavy model weights into GPU memory, do math on one input, then wait. Load weights again. Math on one input. Wait. Every request reads the full model from memory. And you're paying that cost for every single request.
+
+**GPUs are built for matrix-matrix math, not matrix-vector.** Batch your inputs into an array and you get the math GPUs are actually good at.
+
+## How dynamic batching fixes it
+
+Instead of processing requests immediately, you queue them for **10–100ms**. When the batch fills (or timeout hits), you process them all in one GPU call.
+
+Why it works: Loading weights takes the same time for 1 request or 64. Batching spreads that cost across all of them.
+
+![How batching converts matrix-vector work into the matrix-matrix workload GPUs are designed for.](/blog_images/dynamic-batching-page2.jpg)
+
+## What 50ms gets you
+
+- **+50ms latency gets you 8x throughput**
+- **Anthropic's Claude 3:** 9x throughput improvement in production
+- **Pinterest:** 10–25% GPU utilization → 75%+ on the same hardware
+- **NVIDIA Triton docs** confirm 3.7x gains with dynamic batching enabled
+
+## Wiring it up
+
+The implementation is two parameters: `batch_size` and `wait_timeout`. **Ray Serve** and **NVIDIA Triton** both support this.
+
+Same GPUs and same models BUT **4–14x more throughput**.
+
+What's your GPU utilization running at?

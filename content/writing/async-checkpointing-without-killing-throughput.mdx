@@ -1,0 +1,51 @@
+---
+title: 'Async checkpointing: from 40 minutes to under a second'
+description: 'Synchronous checkpointing blocks the training loop while it writes weights to disk. At scale, that means paying for a GPU cluster to sit idle for 30–40 minutes every checkpoint. Splitting the GPU→CPU transfer from the CPU→disk upload reclaims almost all of it.'
+date: 2026-05-19
+tags: ['ray', 'training', 'gpu', 'mlops', 'anyscale']
+published: true
+---
+
+**Checkpointing can waste up to 80+% of training time at scale.**
+
+You can say, "What the hell Nehil! Yesterday you told me, I need to add all this stuff to the checkpoint now you tell it it wastes resources?"
+
+Dont worry here is the solution, **async checkpointing cuts overhead from 40min to &lt;1sec.**
+
+Lets talk about how to checkpoint without killing throughput.
+
+## The bottleneck is synchronous I/O
+
+Default way blocks your training loop:
+
+- GPU → CPU: transfer model state
+- CPU → Disk: write to storage
+- Training waits for both steps to finish
+
+At scale, one checkpoint takes **30–40 minutes**.
+
+The problem as always is: Your **$600/hour GPU cluster** sits idle.
+
+## Async checkpointing splits this into 2 steps
+
+**Step 1 (Sync, Fast): GPU → CPU transfer.** Blocks training briefly (~1 second). Model state moves to CPU memory.
+
+**Step 2 (Async, Slow): CPU → Disk upload.** Background thread handles I/O. Training continues immediately.
+
+Takes 30–40min but you don't wait. Your perceived overhead drops from 40min to &lt;1sec.
+
+**That's 10x–23x speedup.**
+
+The Ray Train pattern handles this.
+
+## Pre-reqs for this to work
+
+- **CPU RAM buffer** (checkpoint must fit in memory)
+- **Storage I/O bandwidth** (must drain before next checkpoint)
+- Each `report()` blocks until previous upload completes (prevents memory overflow)
+
+This unlocks frequent checkpointing. Checkpoint every 100 steps, every 10 steps, even every step.
+
+No performance penalty.
+
+**What's your checkpoint overhead? Measure it. Switch to async if it's >10 seconds.**

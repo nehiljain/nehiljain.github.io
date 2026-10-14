@@ -1,0 +1,38 @@
+---
+title: 'Shared GPU pools: when one model per GPU costs you twice'
+description: 'One GPU per fine-tuned variant strands utilization at 22% across the fleet. Treating the GPU pool as an LRU cache lets you pack 3–5 models onto each device, with a cold-start tax measured in seconds.'
+date: 2026-05-19
+tags: ['ray', 'gpu', 'inference', 'mlops', 'anyscale']
+published: true
+image: /blog_images/shared-gpu-pool-hero.jpg
+---
+
+A personalization team asked me to review their setup. **37 fine-tuned model variants. 37 GPUs. 22% utilization across the fleet.**
+
+The fix is **share GPUs across models**.
+
+## How it works
+
+The idea is simple. When a request comes in, the system checks if that model is already loaded somewhere. If yes, route there. If no, pick a GPU, load the model, run inference.
+
+Three things happen:
+
+- **Models load on demand**
+- **Frequently-used ones stay in memory**
+- **Least-used ones get swapped out to make room**
+
+Each GPU holds about **3–5 models at once**.
+
+![Routing and eviction flow for a shared GPU pool](/blog_images/shared-gpu-pool-2.jpg)
+
+## The numbers
+
+In tests with 100 models, this approach handled **2x more requests** than one-model-per-GPU. Your results will vary, so test with your own workload.
+
+## The tradeoff
+
+The tradeoff is simple: **first request to a cold model takes seconds. After that, milliseconds.**
+
+If you can live with that, you're good.
+
+If you're running a bunch of model variants at under 30% utilization, **this might cut your bill in half.**

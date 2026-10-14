@@ -1,0 +1,39 @@
+---
+title: 'Token-based rate limiting for LLM APIs: three architectures, one trade-off'
+description: 'Request-count rate limits stop making sense when one prompt costs 10 tokens and another costs 10,000. Token-based limits work, but where you enforce them — API gateway, LiteLLM proxy, or in-process with Ray Serve — changes the latency you pay on every request.'
+date: 2026-05-19
+tags: ['ray', 'inference', 'mlops', 'anyscale']
+published: true
+---
+
+A customer asked me about rate-limiting their LLM API: *"Why would I chain deployments instead of separate services for rate limiting?"* I fumbled the answer. Here's what I should have said.
+
+**LLMs broke request-count rate limiting.** One prompt uses 10 tokens. Another uses 10,000. **Same request count, 1000x different cost.**
+
+So how do you enforce token-based limits? 3 options:
+
+## Redis + API Gateway
+
+- The default approach.
+- 3 services. 2 database calls per request.
+- Worst-case: **80–100ms latency** in clustered setups.
+
+## LiteLLM Proxy
+
+- Built-in token limits per user/team.
+- Simple YAML config but 2 services.
+- Trade-off: adds latency overhead.
+- **Probably where most teams should start today.**
+
+## Ray Serve
+
+- Chain rate limiter to model in one deployment.
+- Keeps token counts in memory. **~0.1ms vs 1–3ms for Redis.**
+- Rate limiter and model scale independently.
+- One config. One deploy. One place to monitor.
+
+---
+
+Back to my customer: **chained deployments make sense when you're already on Ray and need sub-ms enforcement. Otherwise, start with LiteLLM.**
+
+Have you set up token-based limits for your LLM apps/endpoints? Would love to chat.

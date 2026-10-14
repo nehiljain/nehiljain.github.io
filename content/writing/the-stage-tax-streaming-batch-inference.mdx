@@ -1,0 +1,32 @@
+---
+title: 'The Stage Tax: why your GPUs wait 30 minutes to work for 5'
+description: 'Most batch inference pipelines run each operator to completion before the next starts, so your GPUs sit idle while CPUs catch up. Streaming between stages turns serial hardware back into parallel hardware — same code, half the wall time.'
+date: 2026-05-19
+tags: ['ray', 'gpu', 'inference', 'optimization', 'anyscale']
+published: true
+image: /blog_images/stage-tax-hero.jpg
+---
+
+Your batch inference pipeline has 3 steps. Decode images: **20 min**. Resize: **10 min**. GPU inference: **5 min**. Total wall time: **35 minutes**. Your GPUs did useful work for 5 of them. That's **14% utilization**. The other 30 minutes? Idle. Waiting for CPU preprocessing to finish the entire dataset before a single batch reaches the GPU.
+
+This is the **Stage Tax**.
+
+## Why it happens
+
+It happens because most pipelines run each operator to completion before starting the next. Decode every image, write to disk. Resize every image, write to disk. Then load everything into GPU memory and infer.
+
+Each stage blocks the next. Your CPUs and GPUs never overlap.
+
+Parallel hardware running in series.
+
+## The fix
+
+The fix is streaming data between operators instead of staging it.
+
+CPU finishes the first batch in seconds. GPU starts immediately. While the GPU infers batch 1, the CPU preprocesses batch 2. Both stay busy until the dataset is done.
+
+Same hardware. Same code logic. **Pipeline drops from 35 minutes to roughly 21.** GPU utilization goes from 14% to near-continuous.
+
+The bottleneck was never compute. It was the dead time between stages where nothing happened.
+
+If your pipeline preprocesses everything before inference starts, you're paying the Stage Tax. The question is how much.
