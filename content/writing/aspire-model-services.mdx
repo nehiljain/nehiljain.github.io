@@ -1,6 +1,6 @@
 ---
 title: "I set up NVIDIA's ASPIRE on Anyscale and found the design I pitch for scaling sims"
-description: "ASPIRE's agent writes robot code, and every sim shares three model services: SAM3, PyRoki and cuRobo. How it learns, why the models live outside the sim, and what Ray adds."
+description: "ASPIRE's agent writes robot code, and every sim shares three perception and planning services: SAM3, PyRoki and cuRobo. How it learns, why the services live outside the sim, and what Ray adds."
 date: 2026-11-17
 tags: ['robotics', 'ray', 'simulation']
 published: false
@@ -27,13 +27,13 @@ An agent writes a program and debugs it in sim on 15 seeds. The program then fac
 
 ![ASPIRE's loop: an agent writes a program, the sim runs it on 15 seeds and the agent fixes it from the logs, the program is scored on 50 new seeds, and verified fixes become skills the next task starts with](/blog_images/aspire-loop.png)
 
-## Two halves: the robot and the models
+## Two halves: the robot and its services
 
-The program never touches a simulator or a model directly.
+The program never touches a simulator or a service directly.
 
 **One environment interface,** with LIBERO, Robosuite, BEHAVIOR-1K or two real YAM arms behind it.
 
-**Three model services,** each with its own port and Python environment:
+**Three perception and planning services,** each with its own port and dependencies:
 
 - SAM3 finds objects from a text prompt. GPU.
 - PyRoki solves inverse kinematics. CPU.
