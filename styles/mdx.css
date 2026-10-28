@@ -52,3 +52,8 @@
   border-radius: 4px;
   padding: 0.1em 0.3em;
 }
+
+/* Tweets and the header plate shape their own images */
+.prose img:not(.tweet-wrapper img, .not-prose img) {
+  @apply rounded-lg;
+}
