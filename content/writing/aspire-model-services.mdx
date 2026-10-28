@@ -1,6 +1,6 @@
 ---
 title: "I set up NVIDIA's ASPIRE on Anyscale and found the design I pitch for scaling sims"
-description: "ASPIRE's agent writes robot code, and every sim shares three perception and planning services: SAM3, PyRoki and cuRobo. How it learns, why the services live outside the sim, and what Ray adds."
+description: "Many sims share one copy of each service. Here's what Ray adds."
 date: 2026-11-17
 tags: ['robotics', 'ray', 'simulation']
 published: false
@@ -9,31 +9,31 @@ image: /blog_images/aspire-provider-split.png
 
 {/* Draft for calendar #40, rewritten 27 Oct as a Ship 30 piece under 500 words. Other headlines, sources, picture origins and the run still to do: aspire-model-services-research.md, next to this file. */}
 
-NVIDIA released [ASPIRE](https://github.com/NVlabs/ASPIRE) v1.0 in October: coding agents write robot programs, with 99% success on 80 LIBERO-Pro tasks.
+NVIDIA released [ASPIRE](https://github.com/NVlabs/ASPIRE) v1.0 in October: it's a coding agent that writes robot control programs, with 99% success on common benchmark tasks.
 
-I wanted to know if it was a one-off. It isn't. I counted 26 projects outside NVIDIA in the same space. A frozen LLM writes robot code, runs it, fixes it and keeps what works. It's called agentic robotics, and CoRL 2026 gave it a [workshop](https://agentic-robotics-workshop.github.io).
+I wanted to know if it was a hype project or a real research direction. After doing some research, I counted 26 projects outside NVIDIA in the same space. A frozen LLM writes robot code, runs it, fixes it and keeps what works. It's called agentic robotics, and CoRL 2026 gave it a [workshop](https://agentic-robotics-workshop.github.io).
 
 So I set ASPIRE up on Anyscale.
 
 ![A robot arm in a LIBERO scene picks up a blue soup can and puts it in a basket](/blog_images/aspire-episode-on-anyscale.gif)
 
-_ASPIRE's example program on one L4, success in 27 s._
+_ASPIRE's example program on 1xL4, success in 27 s._
 
-## Training is fixing code
+## ASPIRE learns by rewriting code, not weights
 
-ASPIRE trains no weights. Its README says "training" is skill refinement instead of gradient descent.
+Its README calls "training" skill refinement by an AI agent, instead of gradient descent.
 
-An agent writes a program and debugs it in sim on 15 seeds. The program then faces 50 new seeds. Fixes a second agent can reproduce become skills for the next task.
+An agent writes a program and debugs it in simulations (using practice envs, then scoring on test envs). It iteratively adds fixes and remembers them as skills for the next task.
 
 ![ASPIRE's loop: an agent writes a program, the sim runs it on 15 seeds and the agent fixes it from the logs, the program is scored on 50 new seeds, and verified fixes become skills the next task starts with](/blog_images/aspire-loop.png)
 
-## Two halves: the robot and its services
+## ASPIRE splits the robot from its services
 
-The program never touches a simulator or a service directly.
+The program talks to two parts.
 
-**One environment interface,** with LIBERO, Robosuite, BEHAVIOR-1K or two real YAM arms behind it.
+**One environment interface,** in Python, with LIBERO, Robosuite, BEHAVIOR-1K or two real YAM arms behind it.
 
-**Three perception and planning services,** each with its own port and dependencies:
+**Three perception and planning services,** each an HTTP server with its own dependencies:
 
 - SAM3 finds objects from a text prompt. GPU.
 - PyRoki solves inverse kinematics. CPU.
@@ -41,25 +41,25 @@ The program never touches a simulator or a service directly.
 
 ![A robot program, cut down from ASPIRE's examples: localize_object calls SAM3, and move_to_pose calls PyRoki and cuRobo](/blog_images/aspire-robot-program-code.png)
 
-Every sim shares one copy of each, "rather than one model loaded per simulator process" ([their code](https://github.com/NVlabs/ASPIRE/blob/fa00f0ef2bc1d91d594b9aa502c22133c9f538f7/src/cap_harness/providers/service_runtime.py#L3-L6)).
+Many sims share one copy of each service, "rather than one model loaded per simulator process" ([their code](https://github.com/NVlabs/ASPIRE/blob/fa00f0ef2bc1d91d594b9aa502c22133c9f538f7/src/cap_harness/providers/service_runtime.py#L3-L6)).
 
-## I pitched the same split for driving sims
+## I pitched the same arch for scaling sims with Ray
 
-On 21 Oct I spoke at Encord's Long Horizon: "Why Sim Platform Shouldn't Be a Batch Job."
+On 21 Oct I spoke at Encord's Long Horizon: "[Why Sim Platform Shouldn't Be a Batch Job](https://encord.com/long-horizon/program/)."
 
-{/* TODO: link the talk post (calendar #17) here once it is up. */}
+{/* TODO: point this link at the talk post (calendar #17) once it is up. */}
 
-A common setup gives each driving scenario its own batch job and model copy. The model works 15 ms of each 1 s tick. Its GPU sits 98% idle.
+A common setup today, gives each scenario its own batch job and model copy. The model works 15 ms of each 1 s tick. Its GPU sits 98% idle.
 
 ![A closed-loop batch job: each AWS Batch job holds a sim and its own copy of the driving model, and the model GPUs show 1.5% busy](/blog_images/aspire-closed-loop-one-model-per-sim.gif)
 
-My fix: sims in one pool, models in another.
+My fix: sims in one pool, robot policies in another.
 
 ![Two pools on one cluster: sims as Ray actors on RTX GPUs, the policy on Ray Serve on H100s](/blog_images/aspire-two-pools.png)
 
 Same split. Arms instead of cars.
 
-## What Ray Serve adds
+## Ray Serve can run that split on fewer GPUs
 
 ASPIRE runs its services by hand on one machine.
 
@@ -69,9 +69,8 @@ ASPIRE runs its services by hand on one machine.
 
 - **Batching:** GPU services take one call at a time. `@serve.batch` runs the queue as one pass. cuRobo 0.8 plans in batches.
 - **Fractional GPUs:** SAM3 and cuRobo used 3.8 GB of my L4's 24 GB. Serve packs them beside the sims.
-- **Multiplexing:** cuRobo hand-rolls a per-robot planner cache. `@serve.multiplexed` caps it and routes calls to the right copy.
 
-![Three panels: batching, four sims' calls run as one GPU pass on SAM3. Fractional GPUs, one L4 split between two sims, SAM3 and cuRobo. Multiplexing, calls for each robot routed to the cuRobo copy that holds its planner](/blog_images/aspire-serve-gpu.png)
+![Two panels: batching, four sims' calls run as one GPU pass on SAM3. Fractional GPUs, one L4 split between two sims, SAM3 and cuRobo](/blog_images/aspire-serve-gpu.png)
 
 **Less to run by hand**
 
@@ -83,14 +82,18 @@ ASPIRE runs its services by hand on one machine.
 
 ![ASPIRE's three services as Serve deployments with num_replicas set to auto, SAM3 and cuRobo on a quarter GPU and PyRoki on two CPUs, and each episode as a Ray task on a quarter GPU](/blog_images/aspire-on-ray-code.png)
 
-I work at Anyscale, which builds Ray. I haven't ported ASPIRE yet. Triton and Knative do parts of this too.
+I'm porting pieces of ASPIRE to Ray for my own curiosity and experiments.
 
-## What I'll measure next
+## Next: more experiments on less compute
 
-ASPIRE logs each service's calls and seconds per episode. Time between calls over time per call is how many sims one copy feeds. That sets batch sizes and copy counts.
+ASPIRE's multi-GPU setup gives each GPU service its own card on a 4-GPU L40 machine.
+
+My goal: more sims and service copies, on fewer GPUs.
+
+First I'll measure how many sims one service copy can feed.
 
 {/* TODO(run): add each service's measured share and sims per copy here (about an hour on the ASPIRE workspace, script in the research file). */}
 
-The agent gets the headlines. The services around the sim cap how many agents run at once.
+ASPIRE learns by testing code in sims. More sims per GPU means faster learning. Will share improvements in a later post.
 
 _ASPIRE is by Runyu Lu, Yubo Wu, Ethan Kou and colleagues at NVIDIA GEAR ([paper](https://arxiv.org/abs/2607.00272))._
