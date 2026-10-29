@@ -45,11 +45,15 @@ async function readManifest(manifestPath = MANIFEST_PATH) {
   }
 }
 
+// Bump when lib/og-render.ts or lib/og-card.tsx changes how cards look, so
+// every card is redrawn once. 2: titles with ' " & < > render as written.
+const CARD_VERSION = 2;
+
 // The site URL is printed on every card, so a new domain redraws them all.
 function hashPost(post, siteUrl) {
   return crypto
     .createHash('sha256')
-    .update(`${post.title}|${post.slugAsParams}|${siteUrl}`)
+    .update(`${post.title}|${post.slugAsParams}|${siteUrl}|${CARD_VERSION}`)
     .digest('hex')
     .slice(0, 16);
 }
