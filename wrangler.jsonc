@@ -8,7 +8,11 @@
     "not_found_handling": "404-page"
   },
   "routes": [{ "pattern": "nehiljain.dev", "custom_domain": true }],
-  // One public copy only: no *.workers.dev address and no per-version preview URLs.
+  // Production lives only at nehiljain.dev: no *.workers.dev address.
   "workers_dev": false,
-  "preview_urls": false
+  // Pull request Previews (.github/workflows/preview.yml) and per-version URLs live on workers.dev,
+  // which sends noindex. Set this to false and deploy to take all of them offline at once.
+  "preview_urls": true,
+  // Nothing differs from production in a Preview, so the block is empty.
+  "previews": {}
 }

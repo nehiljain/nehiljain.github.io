@@ -2,7 +2,7 @@
 
 Personal site and blog of Nehil Jain: writing, projects and CV. Live at **https://nehiljain.dev**.
 
-Next.js 14 (App Router, static export), Velite + MDX, Tailwind and shadcn/ui. Every push to `master` builds and deploys to a Cloudflare Worker through `.github/workflows/deploy.yml` (config in `wrangler.jsonc`; `workers/www-redirect/` sends www to the apex).
+Next.js 14 (App Router, static export), Velite + MDX, Tailwind and shadcn/ui. Every push to `master` builds and deploys to a Cloudflare Worker through `.github/workflows/deploy.yml` (config in `wrangler.jsonc`; `workers/www-redirect/` sends www to the apex). Every pull request gets a Preview at `https://pr-<number>-nehiljain-site.nehiljain.workers.dev`, linked in a PR comment and deleted when the PR closes (`.github/workflows/preview.yml`).
 
 ## Develop
 
