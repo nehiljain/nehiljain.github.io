@@ -24,6 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The PR's merge commit and both parents, so the comment can list the posts it changes.
+          fetch-depth: 2
       - uses: pnpm/action-setup@v6
         with:
           version: 10
@@ -33,6 +36,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+        env:
+          # Unpublished posts get a page at their own URL, so a draft can be reviewed before it goes live.
+          SHOW_DRAFTS: '1'
       - name: Upload the Preview
         id: preview
         run: |
@@ -45,9 +51,21 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Post the link on the pull request
         run: |
-          gh pr comment "${{ github.event.pull_request.number }}" --edit-last --create-if-none \
-            --body "Preview: ${{ steps.preview.outputs.url }} (rebuilt on every push, deleted when this PR closes)"
+          # Drafts aren't in the listings, so link each post the PR adds or changes.
+          posts=$(git diff --name-only --diff-filter=AM HEAD^1 HEAD -- 'content/writing/*.mdx' | sed -e 's|^content/||' -e 's|\.mdx$||')
+          {
+            echo "Preview: $PREVIEW_URL"
+            if [ -n "$posts" ]; then
+              echo
+              echo "Posts in this PR, drafts included:"
+              printf '%s\n' "$posts" | sed "s|^|- $PREVIEW_URL/|"
+            fi
+            echo
+            echo "Rebuilt on every push, deleted when this PR closes."
+          } > comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --edit-last --create-if-none --body-file comment.md
         env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 

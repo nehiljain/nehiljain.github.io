@@ -13,6 +13,10 @@ import { PostTOCRail } from '@/components/writing/post-toc-rail';
 import { PostFooterNext } from '@/components/writing/post-footer-next';
 import { SketchnotePlate } from '@/components/brand/sketchnote-plate';
 
+// Preview builds set SHOW_DRAFTS=1 so an unpublished post can be read at its own URL.
+// Listings, tags and the sitemap still show published posts only.
+const showDrafts = process.env.SHOW_DRAFTS === '1';
+
 interface PostPageProps {
   params: {
     slug: string[];
@@ -69,14 +73,14 @@ export async function generateStaticParams(): Promise<
   PostPageProps['params'][]
 > {
   return posts
-    .filter((post) => post.published)
+    .filter((post) => post.published || showDrafts)
     .map((post) => ({ slug: post.slugAsParams.split('/') }));
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
 
-  if (!post || !post.published) {
+  if (!post || !(post.published || showDrafts)) {
     notFound();
   }
 
