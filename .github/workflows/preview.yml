@@ -16,6 +16,9 @@ concurrency:
 
 env:
   PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+  # The build writes this into og:url and the share images, so a shared preview link unfurls
+  # with the preview's own cards (a draft's card isn't on nehiljain.dev yet).
+  PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}-nehiljain-site.nehiljain.workers.dev
 
 jobs:
   preview:
@@ -45,7 +48,11 @@ jobs:
           set -o pipefail
           npx --yes wrangler@4.155.0 preview --name "$PREVIEW_NAME" --message "${{ github.event.pull_request.head.sha }}" --json > preview.out
           # Wrangler prints its asset-upload lines before the JSON.
-          echo "url=$(sed -n '/^{/,$p' preview.out | jq -er '.preview.urls[0]')" >> "$GITHUB_OUTPUT"
+          url=$(sed -n '/^{/,$p' preview.out | jq -er '.preview.urls[0]')
+          if [ "$url" != "$PREVIEW_URL" ]; then
+            echo "::warning::The Preview is at $url, but its share tags point at $PREVIEW_URL"
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

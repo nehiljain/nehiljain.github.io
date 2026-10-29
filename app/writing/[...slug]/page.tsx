@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import '@/styles/mdx.css';
 import { Metadata } from 'next';
-import { siteMetadata } from '@/config/metadata';
+import { siteMetadata, metadataOrigin } from '@/config/metadata';
 import { sortPosts } from '@/lib/utils';
 import { extractToc } from '@/lib/toc';
 import { PostHeader } from '@/components/writing/post-header';
@@ -39,8 +39,7 @@ export async function generateMetadata({
     return {};
   }
 
-  const baseUrl = siteMetadata.siteUrl;
-  const ogUrl = `${baseUrl}/og/${post.slugAsParams}.png`;
+  const ogUrl = `${metadataOrigin}/og/${post.slugAsParams}.png`;
 
   return {
     title: post.title,
