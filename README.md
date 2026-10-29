@@ -1,8 +1,8 @@
 # nehiljain.github.io
 
-Personal site and blog of Nehil Jain: writing, projects and CV. Live at **https://nehiljain.github.io**.
+Personal site and blog of Nehil Jain: writing, projects and CV. Live at **https://nehiljain.dev**.
 
-Next.js 14 (App Router, static export), Velite + MDX, Tailwind and shadcn/ui. Every push to `master` builds and deploys to GitHub Pages through `.github/workflows/pages.yml`.
+Next.js 14 (App Router, static export), Velite + MDX, Tailwind and shadcn/ui. Every push to `master` builds and deploys to a Cloudflare Worker through `.github/workflows/deploy.yml` (config in `wrangler.jsonc`; `workers/www-redirect/` sends www to the apex). Every pull request gets a Preview at `https://pr-<number>-nehiljain-site.nehiljain.workers.dev`, linked in a PR comment and deleted when the PR closes (`.github/workflows/preview.yml`). Previews render drafts too: a post with `published: false` gets a page at its URL, and the comment links each post the PR changes. A shared preview link unfurls with the preview's own share card.
 
 ## Develop
 
@@ -14,6 +14,16 @@ pnpm test    # vitest
 ```
 
 To add a post, drop an `.mdx` file in `content/writing/` with `title`, `description`, `date`, `published` and `tags` frontmatter. CV and project content lives in `data/resume.ts`.
+
+## Media
+
+Images under 1 MB go in `public/`. Videos and large GIFs go to the `nehiljain-media` R2 bucket instead, which keeps them out of git and under Cloudflare's 25 MiB per-file limit for the site:
+
+```bash
+scripts/upload-media.sh <post-slug> demo.mp4   # prints https://media.nehiljain.dev/<post-slug>/demo.<hash>.mp4
+```
+
+Use the printed URL in the post. The hash in the name means a changed file gets a new URL, so browsers cache each one for a year.
 
 ## Credits
 

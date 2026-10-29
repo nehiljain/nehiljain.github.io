@@ -1,0 +1,86 @@
+name: Preview pull requests
+
+# Every pull request gets a Cloudflare Preview at https://pr-<number>-nehiljain-site.nehiljain.workers.dev,
+# rebuilt on each push and deleted when the PR closes. workers.dev Previews send X-Robots-Tag: noindex.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+  # The build writes this into og:url and the share images, so a shared preview link unfurls
+  # with the preview's own cards (a draft's card isn't on nehiljain.dev yet).
+  PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}-nehiljain-site.nehiljain.workers.dev
+
+jobs:
+  preview:
+    # Pull requests from forks get no secrets.
+    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The PR's merge commit and both parents, so the comment can list the posts it changes.
+          fetch-depth: 2
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          # Unpublished posts get a page at their own URL, so a draft can be reviewed before it goes live.
+          SHOW_DRAFTS: '1'
+      - name: Upload the Preview
+        id: preview
+        run: |
+          set -o pipefail
+          npx --yes wrangler@4.155.0 preview --name "$PREVIEW_NAME" --message "${{ github.event.pull_request.head.sha }}" --json > preview.out
+          # Wrangler prints its asset-upload lines before the JSON.
+          url=$(sed -n '/^{/,$p' preview.out | jq -er '.preview.urls[0]')
+          if [ "$url" != "$PREVIEW_URL" ]; then
+            echo "::warning::The Preview is at $url, but its share tags point at $PREVIEW_URL"
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Post the link on the pull request
+        run: |
+          # Drafts aren't in the listings, so link each post the PR adds or changes.
+          posts=$(git diff --name-only --diff-filter=AM HEAD^1 HEAD -- 'content/writing/*.mdx' | sed -e 's|^content/||' -e 's|\.mdx$||')
+          {
+            echo "Preview: $PREVIEW_URL"
+            if [ -n "$posts" ]; then
+              echo
+              echo "Posts in this PR, drafts included:"
+              printf '%s\n' "$posts" | sed "s|^|- $PREVIEW_URL/|"
+            fi
+            echo
+            echo "Rebuilt on every push, deleted when this PR closes."
+          } > comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --edit-last --create-if-none --body-file comment.md
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
+  cleanup:
+    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - run: npx --yes wrangler@4.155.0 preview delete --name "$PREVIEW_NAME" --worker-name nehiljain-site --skip-confirmation
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

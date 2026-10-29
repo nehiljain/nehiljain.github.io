@@ -5,13 +5,17 @@ import Link from 'next/link';
 
 import '@/styles/mdx.css';
 import { Metadata } from 'next';
-import { siteMetadata } from '@/config/metadata';
+import { siteMetadata, metadataOrigin } from '@/config/metadata';
 import { sortPosts } from '@/lib/utils';
 import { extractToc } from '@/lib/toc';
 import { PostHeader } from '@/components/writing/post-header';
 import { PostTOCRail } from '@/components/writing/post-toc-rail';
 import { PostFooterNext } from '@/components/writing/post-footer-next';
 import { SketchnotePlate } from '@/components/brand/sketchnote-plate';
+
+// Preview builds set SHOW_DRAFTS=1 so an unpublished post can be read at its own URL.
+// Listings, tags and the sitemap still show published posts only.
+const showDrafts = process.env.SHOW_DRAFTS === '1';
 
 interface PostPageProps {
   params: {
@@ -35,8 +39,7 @@ export async function generateMetadata({
     return {};
   }
 
-  const baseUrl = process.env.CF_PAGES_URL ?? siteMetadata.siteUrl;
-  const ogUrl = `${baseUrl}/og/${post.slugAsParams}.png`;
+  const ogUrl = `${metadataOrigin}/og/${post.slugAsParams}.png`;
 
   return {
     title: post.title,
@@ -69,14 +72,14 @@ export async function generateStaticParams(): Promise<
   PostPageProps['params'][]
 > {
   return posts
-    .filter((post) => post.published)
+    .filter((post) => post.published || showDrafts)
     .map((post) => ({ slug: post.slugAsParams.split('/') }));
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPostFromParams(params);
 
-  if (!post || !post.published) {
+  if (!post || !(post.published || showDrafts)) {
     notFound();
   }
 

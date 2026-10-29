@@ -1,0 +1,18 @@
+// Cloudflare Worker that serves the static export in out/ at nehiljain.dev.
+// Deployed by .github/workflows/deploy.yml on every push to master.
+{
+  "name": "nehiljain-site",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "nehiljain.dev", "custom_domain": true }],
+  // Production lives only at nehiljain.dev: no *.workers.dev address.
+  "workers_dev": false,
+  // Pull request Previews (.github/workflows/preview.yml) and per-version URLs live on workers.dev,
+  // which sends noindex. Set this to false and deploy to take all of them offline at once.
+  "preview_urls": true,
+  // Nothing differs from production in a Preview, so the block is empty.
+  "previews": {}
+}

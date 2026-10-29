@@ -45,10 +45,15 @@ async function readManifest(manifestPath = MANIFEST_PATH) {
   }
 }
 
-function hashPost(post) {
+// Bump when lib/og-render.ts or lib/og-card.tsx changes how cards look, so
+// every card is redrawn once. 2: titles with ' " & < > render as written.
+const CARD_VERSION = 2;
+
+// The site URL is printed on every card, so a new domain redraws them all.
+function hashPost(post, siteUrl) {
   return crypto
     .createHash('sha256')
-    .update(`${post.title}|${post.slugAsParams}`)
+    .update(`${post.title}|${post.slugAsParams}|${siteUrl}|${CARD_VERSION}`)
     .digest('hex')
     .slice(0, 16);
 }
@@ -62,11 +67,12 @@ export async function generate({
   const siteUrl = siteUrlOverride ?? (await readSiteUrl());
   const renderOgPng = await getRenderOgPng();
   const postsRaw = await fs.readFile(veliteOut, 'utf8');
-  // Only render OG images for posts that will actually be exported.
-  // Unpublished posts are filtered out by generateStaticParams in
-  // app/writing/[...slug]/page.tsx, so their PNGs would be orphaned.
+  // Only render OG images for posts that will actually be exported, matching
+  // generateStaticParams in app/writing/[...slug]/page.tsx: published posts,
+  // plus drafts in preview builds (SHOW_DRAFTS=1).
+  const showDrafts = process.env.SHOW_DRAFTS === '1';
   const posts = JSON.parse(postsRaw).filter(
-    (p) => p.published === undefined || p.published
+    (p) => p.published === undefined || p.published || showDrafts
   );
   await fs.mkdir(ogDir, { recursive: true });
   const manifest = await readManifest(manifestPath);
@@ -75,7 +81,7 @@ export async function generate({
   let skipped = 0;
 
   for (const post of posts) {
-    const hash = hashPost(post);
+    const hash = hashPost(post, siteUrl);
     newManifest[post.slugAsParams] = hash;
     const outPath = path.join(ogDir, `${post.slugAsParams}.png`);
     let exists = false;

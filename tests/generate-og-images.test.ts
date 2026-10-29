@@ -73,6 +73,43 @@ describe('generate-og-images', () => {
     expect(second.skipped).toBe(1);
   });
 
+  it('renders drafts only when SHOW_DRAFTS=1', async () => {
+    const fixture = JSON.parse(await fs.readFile(veliteOut, 'utf8'));
+    fixture[1].published = false;
+    await fs.writeFile(veliteOut, JSON.stringify(fixture));
+    const prod = await generate({
+      veliteOut,
+      ogDir,
+      manifestPath,
+      siteUrlOverride: 'x'
+    });
+    expect(prod.total).toBe(1);
+    process.env.SHOW_DRAFTS = '1';
+    try {
+      const preview = await generate({
+        veliteOut,
+        ogDir,
+        manifestPath,
+        siteUrlOverride: 'x'
+      });
+      expect(preview.total).toBe(2);
+    } finally {
+      delete process.env.SHOW_DRAFTS;
+    }
+  });
+
+  it('regenerates every card when siteUrl changes', async () => {
+    await generate({ veliteOut, ogDir, manifestPath, siteUrlOverride: 'x' });
+    const second = await generate({
+      veliteOut,
+      ogDir,
+      manifestPath,
+      siteUrlOverride: 'y'
+    });
+    expect(second.written).toBe(2);
+    expect(second.skipped).toBe(0);
+  });
+
   it('reads siteUrl from config/metadata.ts (not config/site.ts)', async () => {
     // Run without an override so the script reads config/metadata.ts.
     // Verify the resulting PNG embeds the metadata.ts value, not the

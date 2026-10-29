@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { siteMetadata } from '@/config/metadata';
+import { siteMetadata, metadataOrigin } from '@/config/metadata';
 
 const fontDisplay = Bagel_Fat_One({
   subsets: ['latin'],
@@ -23,7 +23,7 @@ const fontScript = Caveat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteMetadata.siteUrl),
+  metadataBase: new URL(metadataOrigin),
   title: {
     default: siteMetadata.title,
     template: `%s | ${siteMetadata.title}`
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: siteMetadata.title,
     description: siteMetadata.description,
-    url: siteMetadata.siteUrl,
+    url: metadataOrigin,
     siteName: siteMetadata.siteName,
     locale: siteMetadata.locale,
     type: 'website',

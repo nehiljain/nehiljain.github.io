@@ -1,5 +1,30 @@
 import { describe, it, expect } from 'vitest';
-import { renderOgPng } from '@/lib/og-render';
+import { ogCardVdom, renderOgPng } from '@/lib/og-render';
+
+// All text in a satori VDOM, in order.
+function textOf(node: unknown): string {
+  if (typeof node === 'string') return node;
+  if (Array.isArray(node)) return node.map(textOf).join('');
+  if (node && typeof node === 'object' && 'props' in node) {
+    return textOf((node as { props: { children?: unknown } }).props.children);
+  }
+  return '';
+}
+
+describe('ogCardVdom', () => {
+  it('renders quotes, ampersands and angle brackets as written', () => {
+    const title = `Hormozi's "notes" & <tags> &amp;`;
+    const text = textOf(
+      ogCardVdom({
+        title,
+        footerUrl: 'nehiljain.dev',
+        githubUrl: 'github.com/nehiljain'
+      })
+    );
+    expect(text).toContain(title);
+    expect(text).not.toContain('&#x27;');
+  });
+});
 
 describe('renderOgPng', () => {
   it('returns a non-empty PNG buffer with correct magic bytes', async () => {
