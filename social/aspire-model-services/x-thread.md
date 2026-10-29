@@ -2,7 +2,7 @@
 
 Seven posts that follow the LinkedIn post's order and rhythm, cut to X's limit. The counts use X's weighting: "•" and "≈" count as 2, and a link counts as 23. All fit in 280 without Premium. The first post carries the video and no link; the link waits for the last post.
 
-**1/** 168 · attach `aspire-explainer-4x5.mp4`
+**1/** 168 · attach [`aspire-explainer-4x5.mp4`](https://media.nehiljain.dev/aspire-model-services/aspire-explainer-4x5.7885666ebf.mp4)
 
 ```text
 NVIDIA's ASPIRE gets 99% on 80 LIBERO-Pro tasks without gradient descent.
@@ -77,4 +77,4 @@ I work at Anyscale, which builds Ray.
 ## After posting
 
 - Reply to replies the same day. On X the thread is the mirror; the replies are the reach.
-- When ASPIRE's authors post an update, reply with `aspire-run-4x5.mp4` (the run scene alone, 16 s) and one line on what you ran.
+- When ASPIRE's authors post an update, reply with [`aspire-run-4x5.mp4`](https://media.nehiljain.dev/aspire-model-services/aspire-run-4x5.6284e9a356.mp4) (the run scene alone, 16 s) and one line on what you ran.

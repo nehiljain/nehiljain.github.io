@@ -1,6 +1,6 @@
 # LinkedIn: video post (Tue 17 Nov, about 8:30 am PT)
 
-Upload `aspire-explainer-4x5.mp4`, then `aspire-explainer-thumbnail.png` as the thumbnail. No captions file: the video has no voice.
+Upload [`aspire-explainer-4x5.mp4`](https://media.nehiljain.dev/aspire-model-services/aspire-explainer-4x5.7885666ebf.mp4), then `aspire-explainer-thumbnail.png` as the thumbnail. No captions file: the video has no voice.
 
 ## Post
 

@@ -15,7 +15,7 @@ I wanted to know if it was a hype project or a real research direction. After do
 
 So I set ASPIRE up on Anyscale.
 
-![A robot arm in a LIBERO scene picks up a blue soup can and puts it in a basket](/blog_images/aspire-episode-on-anyscale.gif)
+![A robot arm in a LIBERO scene picks up a blue soup can and puts it in a basket](https://media.nehiljain.dev/aspire-model-services/aspire-episode-on-anyscale.c81d38cc9d.gif)
 
 _ASPIRE's example program on 1xL4, success in 27 s._
 
@@ -51,7 +51,7 @@ On 21 Oct I spoke at Encord's Long Horizon: "[Why Sim Platform Shouldn't Be a Ba
 
 A common setup today, gives each scenario its own batch job and model copy. The model works 15 ms of each 1 s tick. Its GPU sits 98% idle.
 
-![A closed-loop batch job: each AWS Batch job holds a sim and its own copy of the driving model, and the model GPUs show 1.5% busy](/blog_images/aspire-closed-loop-one-model-per-sim.gif)
+![A closed-loop batch job: each AWS Batch job holds a sim and its own copy of the driving model, and the model GPUs show 1.5% busy](https://media.nehiljain.dev/aspire-model-services/aspire-closed-loop-one-model-per-sim.e83600993d.gif)
 
 My fix: sims in one pool, robot policies in another.
 
