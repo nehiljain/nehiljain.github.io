@@ -3,7 +3,7 @@ import { DATA } from '@/data/resume';
 export const siteMetadata = {
   title: DATA.name,
   description: DATA.description,
-  siteUrl: 'https://nehiljain.github.io',
+  siteUrl: 'https://nehiljain.dev',
   siteName: DATA.name,
   twitterHandle: '@nehiljain',
   socialImage: '/favicons/og-image.png',

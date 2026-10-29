@@ -38,5 +38,8 @@ next-env.d.ts
 # velite files
 .velite
 
+# wrangler dev state
+.wrangler
+
 # generated OG images
 /public/og/test-results/

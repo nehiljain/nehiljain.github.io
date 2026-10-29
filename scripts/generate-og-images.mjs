@@ -45,10 +45,11 @@ async function readManifest(manifestPath = MANIFEST_PATH) {
   }
 }
 
-function hashPost(post) {
+// The site URL is printed on every card, so a new domain redraws them all.
+function hashPost(post, siteUrl) {
   return crypto
     .createHash('sha256')
-    .update(`${post.title}|${post.slugAsParams}`)
+    .update(`${post.title}|${post.slugAsParams}|${siteUrl}`)
     .digest('hex')
     .slice(0, 16);
 }
@@ -75,7 +76,7 @@ export async function generate({
   let skipped = 0;
 
   for (const post of posts) {
-    const hash = hashPost(post);
+    const hash = hashPost(post, siteUrl);
     newManifest[post.slugAsParams] = hash;
     const outPath = path.join(ogDir, `${post.slugAsParams}.png`);
     let exists = false;

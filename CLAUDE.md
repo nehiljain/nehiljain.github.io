@@ -31,7 +31,9 @@ Personal site / blog built on **Next.js 14 (App Router) + Velite + MDX + Tailwin
 
 **Site metadata.** `config/metadata.ts` is the single source of truth (title, description, `siteUrl`, social), used by `app/layout.tsx` and post pages. The template's `config/site.ts` was removed.
 
-**Deploy.** GitHub Pages at https://nehiljain.github.io via `.github/workflows/pages.yml` on every push to `master`.
+**Deploy.** Cloudflare Workers static assets at https://nehiljain.dev via `.github/workflows/deploy.yml` on every push to `master`. `wrangler.jsonc` serves `out/`; `workers/www-redirect/` redirects www to the apex. Explainers in their own repos (e.g. lerobot-time-sync) deploy as separate Workers on path routes such as `nehiljain.dev/lerobot-time-sync*`. nehiljain.github.io redirects here through the GitHub Pages custom-domain setting. `public/_headers` sets a one-year cache on `/_next/static/*` and basic security headers.
+
+**Media.** Images under 1 MB live in `public/`. Videos and large GIFs never go in git: `scripts/upload-media.sh <post-slug> <file>` puts them in the `nehiljain-media` R2 bucket and prints a `https://media.nehiljain.dev/...` URL with a content hash, cached for a year.
 
 **Sketchnotes.** `sketchnotes/` is a separate design system (not part of the Next app) — `DESIGN.md` defines a hand-drawn sketchnote brand (Macchiato Rose on Cabin Sketch) used for one-page technical illustrations. Each subdirectory is one sketchnote. Treat it as design assets, not runtime code.
 

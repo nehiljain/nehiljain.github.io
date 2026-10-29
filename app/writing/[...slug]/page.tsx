@@ -35,7 +35,7 @@ export async function generateMetadata({
     return {};
   }
 
-  const baseUrl = process.env.CF_PAGES_URL ?? siteMetadata.siteUrl;
+  const baseUrl = siteMetadata.siteUrl;
   const ogUrl = `${baseUrl}/og/${post.slugAsParams}.png`;
 
   return {

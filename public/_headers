@@ -1,0 +1,10 @@
+# Cloudflare reads this file from the build output (out/_headers) and adds these headers to the responses.
+
+# Next.js puts a content hash in every file name here, so browsers can keep them for a year.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN

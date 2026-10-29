@@ -7,8 +7,8 @@ export const DATA = {
   title: 'Member of Technical Staff',
   currentFocus: 'Scaling AI infrastructure for the enterprise',
   location: 'SF Bay Area',
-  // nehiljain.com lapsed in 2026 and its mail now goes to a third party. Add a new address to bring the Email links back.
-  email: '',
+  // Forwards to a personal inbox through Cloudflare Email Routing.
+  email: 'hello@nehiljain.dev',
   description: "An ML platform engineer who loves solving problems for customers at Anyscale. I have been partnering with ML team and leaders to scale their AI solutions with Ray. I have been coding for over 10+ years. I love distributed systems and the startup ethos. Also a bit of sketchnoting and pickleball (these keep changing)",
   avatarUrl: '/nehil_profile_pic.jpg',
   contact: {

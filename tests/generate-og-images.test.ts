@@ -73,6 +73,18 @@ describe('generate-og-images', () => {
     expect(second.skipped).toBe(1);
   });
 
+  it('regenerates every card when siteUrl changes', async () => {
+    await generate({ veliteOut, ogDir, manifestPath, siteUrlOverride: 'x' });
+    const second = await generate({
+      veliteOut,
+      ogDir,
+      manifestPath,
+      siteUrlOverride: 'y'
+    });
+    expect(second.written).toBe(2);
+    expect(second.skipped).toBe(0);
+  });
+
   it('reads siteUrl from config/metadata.ts (not config/site.ts)', async () => {
     // Run without an override so the script reads config/metadata.ts.
     // Verify the resulting PNG embeds the metadata.ts value, not the
